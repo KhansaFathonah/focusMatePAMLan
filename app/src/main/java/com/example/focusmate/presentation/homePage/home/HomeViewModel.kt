@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.home
+package com.example.focusmate.presentation.homePage.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

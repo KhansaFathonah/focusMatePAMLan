@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.home
+package com.example.focusmate.presentation.homePage.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

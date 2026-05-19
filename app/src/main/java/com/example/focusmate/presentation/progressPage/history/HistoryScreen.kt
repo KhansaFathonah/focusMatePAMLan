@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.history
+package com.example.focusmate.presentation.progressPage.history
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.settingsPage.settings
+package com.example.focusmate.presentation.progressPage.progress
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,7 +12,7 @@ import com.example.focusmate.presentation.theme.BackgroundDark
 import com.example.focusmate.presentation.theme.TextPrimary
 
 @Composable
-fun SettingsScreen(
+fun ProgressScreen(
     navController: NavController
 ) {
 
@@ -25,7 +25,7 @@ fun SettingsScreen(
     ) {
 
         Text(
-            text = "Settings Screen",
+            text = "Progress Screen",
             color = TextPrimary
         )
     }

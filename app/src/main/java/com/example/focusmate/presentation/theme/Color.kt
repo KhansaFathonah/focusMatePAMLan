@@ -96,7 +96,7 @@ BUTTON COLORS
 */
 
 val ButtonPrimary =
-    Color(0xFFB9C7FF)
+    Color(0xFFB1C4FF)
 
 val ButtonDark =
     Color(0xFF24345C)

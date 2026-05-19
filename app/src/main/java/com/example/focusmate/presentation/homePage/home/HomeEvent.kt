@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.home
+package com.example.focusmate.presentation.homePage.home
 
 import com.example.focusmate.domain.model.Task
 
