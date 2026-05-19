@@ -3,7 +3,6 @@ package com.example.focusmate.presentation.focus.selecttask
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,13 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -25,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,11 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.focusmate.domain.model.Task
 import com.example.focusmate.presentation.components.TaskSelectionCard
 import com.example.focusmate.presentation.focus.FocusViewModel
 import com.example.focusmate.presentation.navigation.Screen
 import com.example.focusmate.presentation.theme.BackgroundDark
-import com.example.focusmate.utils.TaskUtils
 
 @Composable
 fun SelectTaskScreen(
@@ -58,22 +51,8 @@ fun SelectTaskScreen(
     val uiState by
     viewModel.uiState.collectAsState()
 
-    /*
-    ====================================
-    SORT TASKS
-    overdue first
-    nearest deadline
-    ====================================
-    */
-
-    val sortedTasks = remember(
-        uiState.tasks
-    ) {
-
-        TaskUtils.sortTasksByPriority(
-            uiState.tasks
-        )
-    }
+    val displayTasks =
+        sampleSelectTasks()
 
     /*
     ====================================
@@ -100,8 +79,8 @@ fun SelectTaskScreen(
                 )
                 .padding(
 
-                    horizontal = 24.dp,
-                    vertical = 22.dp
+                    horizontal = 29.dp,
+                    vertical = 50.dp
                 )
                 .navigationBarsPadding()
         ) {
@@ -167,7 +146,7 @@ fun SelectTaskScreen(
             }
 
             Spacer(
-                modifier = Modifier.height(28.dp)
+                modifier = Modifier.height(32.dp)
             )
 
             /*
@@ -176,31 +155,16 @@ fun SelectTaskScreen(
             ====================================
             */
 
-            LazyColumn(
+            Column(
 
                 modifier = Modifier
                     .weight(1f),
 
                 verticalArrangement =
-                    Arrangement.spacedBy(18.dp),
-
-                contentPadding =
-                    PaddingValues(
-
-                        bottom = 24.dp
-                    )
+                    Arrangement.spacedBy(20.dp)
             ) {
 
-                items(
-
-                    items = sortedTasks,
-
-                    key = { task ->
-
-                        task.id
-                    }
-
-                ) { task ->
+                displayTasks.forEach { task ->
 
                     TaskSelectionCard(
 
@@ -217,74 +181,33 @@ fun SelectTaskScreen(
                             viewModel.selectTask(
                                 task
                             )
+
+                            navController.navigate(
+                                Screen.StartFocus.route
+                            )
                         }
                     )
                 }
             }
-
-            /*
-            ====================================
-            CONTINUE BUTTON
-            ====================================
-            */
-
-            Button(
-
-                onClick = {
-
-                    navController.navigate(
-                        Screen.StartFocus.route
-                    )
-                },
-
-                enabled =
-                    uiState.selectedTask != null,
-
-                modifier = Modifier
-                    .align(
-                        Alignment.CenterHorizontally
-                    )
-                    .padding(
-
-                        top = 12.dp,
-                        bottom = 18.dp
-                    )
-                    .fillMaxWidth(0.58f)
-                    .height(56.dp),
-
-                shape =
-                    RoundedCornerShape(22.dp),
-
-                colors =
-                    ButtonDefaults.buttonColors(
-
-                        containerColor =
-
-                            if (
-                                uiState.selectedTask != null
-                            )
-
-                                Color(0xFFB1C4FF)
-
-                            else
-
-                                Color(0xFF5F6984),
-
-                        contentColor =
-                            Color(0xFF1B2336)
-                    )
-            ) {
-
-                Text(
-
-                    text = "Continue",
-
-                    fontSize = 17.sp,
-
-                    fontWeight =
-                        FontWeight.Bold
-                )
-            }
         }
     }
+}
+
+private fun sampleSelectTasks(): List<Task> {
+
+    return listOf(
+        Task(
+            id = -1,
+            title = "Complete Math Assignment",
+            deadline = "Today, 5:00 PM",
+            status = "In Progress",
+            focusMinutes = 50
+        ),
+        Task(
+            id = -2,
+            title = "Review Chemistry Notes",
+            deadline = "Tomorrow, 12:00 PM",
+            status = "Not Started"
+        )
+    )
 }

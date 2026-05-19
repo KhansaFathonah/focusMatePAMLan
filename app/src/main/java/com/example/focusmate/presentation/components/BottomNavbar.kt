@@ -1,13 +1,15 @@
 package com.example.focusmate.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
@@ -17,12 +19,15 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.focusmate.presentation.navigation.BottomNavItem
@@ -81,7 +86,7 @@ fun BottomNavbar(
 
             route = Screen.Progress.route,
 
-            icon = Icons.Filled.ShowChart
+            icon = Icons.AutoMirrored.Filled.ShowChart
         ),
 
         BottomNavItem(
@@ -105,18 +110,18 @@ fun BottomNavbar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .height(82.dp)
+            .height(64.dp)
             .shadow(
 
-                elevation = 20.dp,
+                elevation = 14.dp,
 
                 shape =
-                    RoundedCornerShape(30.dp),
+                    RoundedCornerShape(32.dp),
 
                 clip = false
             )
             .clip(
-                RoundedCornerShape(30.dp)
+                RoundedCornerShape(32.dp)
             )
             .background(
 
@@ -148,7 +153,7 @@ fun BottomNavbar(
 
                 horizontal = 10.dp,
 
-                vertical = 4.dp
+                vertical = 2.dp
             ),
 
         /*
@@ -214,14 +219,22 @@ fun BottomNavbar(
 
                 icon = {
 
-                    Icon(
+                    Box(
+                        modifier = Modifier.size(22.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
 
-                        imageVector =
-                            item.icon,
+                        Icon(
 
-                        contentDescription =
-                            item.title
-                    )
+                            imageVector =
+                                item.icon,
+
+                            contentDescription =
+                                item.title,
+
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 },
 
                 /*
@@ -233,7 +246,9 @@ fun BottomNavbar(
                 label = {
 
                     Text(
-                        text = item.title
+                        text = item.title,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 },
 

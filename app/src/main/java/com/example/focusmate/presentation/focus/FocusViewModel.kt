@@ -8,6 +8,8 @@ import com.example.focusmate.domain.usecase.task.UpdateTaskStatusUseCase
 import com.example.focusmate.utils.TaskUtils
 import com.example.focusmate.utils.TimeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,6 +44,8 @@ class FocusViewModel @Inject constructor(
             StateFlow<FocusUiState> =
 
         _uiState.asStateFlow()
+
+    private var timerJob: Job? = null
 
     /*
     ====================================
@@ -291,6 +295,9 @@ class FocusViewModel @Inject constructor(
         task: Task
     ) {
 
+        val durationSeconds =
+            _uiState.value.selectedDuration * 60
+
         viewModelScope.launch {
 
             updateTaskStatusUseCase(
@@ -298,6 +305,106 @@ class FocusViewModel @Inject constructor(
                 task.copy(
                     status = "In Progress"
                 )
+            )
+        }
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+                isRunning = true,
+                isPaused = false,
+                isCompleted = false,
+                remainingSeconds = durationSeconds,
+                totalSeconds = durationSeconds,
+                progress = 1f
+            )
+        }
+
+        startCountdown()
+    }
+
+    fun startQuickFocus() {
+
+        val durationSeconds =
+            _uiState.value.selectedDuration * 60
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+                isQuickFocus = true,
+                isRunning = true,
+                isPaused = false,
+                isCompleted = false,
+                remainingSeconds = durationSeconds,
+                totalSeconds = durationSeconds,
+                progress = 1f
+            )
+        }
+
+        startCountdown()
+    }
+
+    private fun startCountdown() {
+
+        timerJob?.cancel()
+
+        timerJob = viewModelScope.launch {
+
+            while (true) {
+
+                delay(1000)
+
+                _uiState.update { currentState ->
+
+                    if (
+                        !currentState.isRunning ||
+                        currentState.isPaused ||
+                        currentState.remainingSeconds <= 0
+                    ) {
+
+                        currentState
+
+                    } else {
+
+                        val newRemainingSeconds =
+                            currentState.remainingSeconds - 1
+
+                        val newProgress =
+                            if (currentState.totalSeconds > 0) {
+                                newRemainingSeconds.toFloat() /
+                                        currentState.totalSeconds.toFloat()
+                            } else {
+                                0f
+                            }
+
+                        currentState.copy(
+                            remainingSeconds = newRemainingSeconds,
+                            progress = newProgress.coerceIn(0f, 1f),
+                            isRunning = newRemainingSeconds > 0,
+                            isCompleted = newRemainingSeconds == 0
+                        )
+                    }
+                }
+
+                if (_uiState.value.isCompleted) {
+                    timerJob?.cancel()
+                    break
+                }
+            }
+        }
+    }
+
+    fun pauseOrResumeSession() {
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+                isPaused =
+                    if (currentState.isRunning) {
+                        !currentState.isPaused
+                    } else {
+                        false
+                    }
             )
         }
     }
@@ -369,6 +476,36 @@ class FocusViewModel @Inject constructor(
         }
     }
 
+    fun extendDuration(
+        minutes: Int
+    ) {
+
+        val addedSeconds =
+            minutes * 60
+
+        _uiState.update { currentState ->
+
+            val newRemainingSeconds =
+                currentState.remainingSeconds + addedSeconds
+
+            val newTotalSeconds =
+                currentState.totalSeconds + addedSeconds
+
+            currentState.copy(
+                selectedDuration = currentState.selectedDuration + minutes,
+                remainingSeconds = newRemainingSeconds,
+                totalSeconds = newTotalSeconds,
+                progress =
+                    if (newTotalSeconds > 0) {
+                        newRemainingSeconds.toFloat() /
+                                newTotalSeconds.toFloat()
+                    } else {
+                        0f
+                    }
+            )
+        }
+    }
+
     /*
     ====================================
     QUICK FOCUS
@@ -397,6 +534,9 @@ class FocusViewModel @Inject constructor(
 
     fun resetSession() {
 
+        timerJob?.cancel()
+        timerJob = null
+
         _uiState.update { currentState ->
 
             currentState.copy(
@@ -420,5 +560,11 @@ class FocusViewModel @Inject constructor(
                 progress = 1f
             )
         }
+    }
+
+    override fun onCleared() {
+
+        timerJob?.cancel()
+        super.onCleared()
     }
 }

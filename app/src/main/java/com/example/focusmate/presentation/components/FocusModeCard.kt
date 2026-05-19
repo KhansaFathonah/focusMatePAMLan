@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -52,15 +53,18 @@ fun FocusModeCard(
 
         modifier = modifier
             .fillMaxWidth()
+            .defaultMinSize(
+                minHeight = 94.dp
+            )
             .clip(
-                RoundedCornerShape(28.dp)
+                RoundedCornerShape(20.dp)
             )
             .clickable {
 
                 onClick()
             },
 
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(20.dp),
 
         colors = CardDefaults.cardColors(
 
@@ -89,7 +93,7 @@ fun FocusModeCard(
                     start = 22.dp,
                     end = 22.dp,
                     top = 22.dp,
-                    bottom = 22.dp
+                    bottom = 23.dp
                 ),
 
             verticalAlignment =
@@ -105,14 +109,14 @@ fun FocusModeCard(
             Box(
 
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(48.dp)
                     .background(
 
                         color =
                             Color(0xFF0C1A33),
 
                         shape =
-                            RoundedCornerShape(18.dp)
+                            RoundedCornerShape(16.dp)
                     ),
 
                 contentAlignment =
@@ -133,7 +137,7 @@ fun FocusModeCard(
             }
 
             Spacer(
-                modifier = Modifier.width(16.dp)
+                modifier = Modifier.width(17.dp)
             )
 
             /*
@@ -165,6 +169,7 @@ fun FocusModeCard(
                         Color(0xFF1B2336),
 
                     fontSize = 18.sp,
+                    lineHeight = 27.sp,
 
                     fontWeight =
                         FontWeight.Bold,
@@ -197,7 +202,7 @@ fun FocusModeCard(
                     fontWeight =
                         FontWeight.Medium,
 
-                    lineHeight = 20.sp,
+                    lineHeight = 27.sp,
 
                     maxLines = 2,
 

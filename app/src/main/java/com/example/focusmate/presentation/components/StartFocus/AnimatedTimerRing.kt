@@ -63,7 +63,7 @@ fun AnimatedTimerRing(
     Box(
 
         modifier = modifier
-            .size(280.dp),
+            .size(288.dp),
 
         contentAlignment =
             Alignment.Center
@@ -78,7 +78,7 @@ fun AnimatedTimerRing(
         Canvas(
 
             modifier = Modifier
-                .size(280.dp)
+                .size(288.dp)
 
         ) {
 
@@ -88,7 +88,11 @@ fun AnimatedTimerRing(
             ================================
             */
 
-            val strokeWidth = 22.dp.toPx()
+            val strokeWidth = 10.dp.toPx()
+
+            val gapAngle = 22f
+
+            val segmentSweep = 90f - gapAngle
 
             /*
             ================================
@@ -96,33 +100,40 @@ fun AnimatedTimerRing(
             ================================
             */
 
-            drawArc(
+            repeat(4) { index ->
 
-                color =
-                    Color(0xFF25345A),
+                drawArc(
 
-                startAngle = -90f,
+                    color =
+                        Color(0xFF25345A),
 
-                sweepAngle = 360f,
+                    startAngle =
+                        -90f + (index * 90f) + (gapAngle / 2f),
 
-                useCenter = false,
+                    sweepAngle = segmentSweep,
 
-                topLeft = Offset.Zero,
+                    useCenter = false,
 
-                size = Size(
+                    topLeft = Offset(
+                        strokeWidth / 2f,
+                        strokeWidth / 2f
+                    ),
 
-                    width = size.width,
+                    size = Size(
 
-                    height = size.height
-                ),
+                        width = size.width - strokeWidth,
 
-                style = Stroke(
+                        height = size.height - strokeWidth
+                    ),
 
-                    width = strokeWidth,
+                    style = Stroke(
 
-                    cap = StrokeCap.Round
+                        width = strokeWidth,
+
+                        cap = StrokeCap.Round
+                    )
                 )
-            )
+            }
 
             /*
             ================================
@@ -130,34 +141,48 @@ fun AnimatedTimerRing(
             ================================
             */
 
-            drawArc(
+            repeat(4) { index ->
 
-                color =
-                    Color(0xFFB1C4FF),
+                val segmentProgress =
+                    ((animatedProgress * 4f) - index)
+                        .coerceIn(0f, 1f)
 
-                startAngle = -90f,
+                if (segmentProgress > 0f) {
 
-                sweepAngle =
-                    360f * animatedProgress,
+                    drawArc(
 
-                useCenter = false,
+                        color =
+                            Color(0xFFB1C4FF),
 
-                topLeft = Offset.Zero,
+                        startAngle =
+                            -90f + (index * 90f) + (gapAngle / 2f),
 
-                size = Size(
+                        sweepAngle =
+                            segmentSweep * segmentProgress,
 
-                    width = size.width,
+                        useCenter = false,
 
-                    height = size.height
-                ),
+                        topLeft = Offset(
+                            strokeWidth / 2f,
+                            strokeWidth / 2f
+                        ),
 
-                style = Stroke(
+                        size = Size(
 
-                    width = strokeWidth,
+                            width = size.width - strokeWidth,
 
-                    cap = StrokeCap.Round
-                )
-            )
+                            height = size.height - strokeWidth
+                        ),
+
+                        style = Stroke(
+
+                            width = strokeWidth,
+
+                            cap = StrokeCap.Round
+                        )
+                    )
+                }
+            }
         }
 
         /*
@@ -184,7 +209,7 @@ fun AnimatedTimerRing(
 
                 color = Color.White,
 
-                fontSize = 54.sp,
+                fontSize = 48.sp,
 
                 fontWeight =
                     FontWeight.Light
@@ -203,7 +228,7 @@ fun AnimatedTimerRing(
                 color =
                     Color(0xFF7B86A8),
 
-                fontSize = 16.sp
+                fontSize = 14.sp
             )
         }
     }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -43,24 +44,6 @@ fun TaskSelectionCard(
 
     /*
     ====================================
-    STATUS COLOR
-    ====================================
-    */
-
-    val statusColor = when (task.status) {
-
-        "In Progress" ->
-            Color(0xFF091633)
-
-        "Completed" ->
-            Color(0xFF2E7D32)
-
-        else ->
-            Color(0xFF616161)
-    }
-
-    /*
-    ====================================
     CONTAINER
     ====================================
     */
@@ -91,7 +74,7 @@ fun TaskSelectionCard(
                         end = 0.dp,
                         bottom = 0.dp
                     )
-                    .height(118.dp)
+                    .height(121.dp)
                     .background(
 
                         color =
@@ -99,7 +82,7 @@ fun TaskSelectionCard(
                                 .copy(alpha = 0.9f),
 
                         shape =
-                            RoundedCornerShape(30.dp)
+                            RoundedCornerShape(20.dp)
                     )
             )
         }
@@ -119,7 +102,7 @@ fun TaskSelectionCard(
                     onClick()
                 },
 
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(20.dp),
 
             border =
 
@@ -152,10 +135,13 @@ fun TaskSelectionCard(
 
                 modifier = Modifier
                     .fillMaxWidth()
+                    .defaultMinSize(
+                        minHeight = 121.dp
+                    )
                     .padding(
 
                         horizontal = 20.dp,
-                        vertical = 18.dp
+                        vertical = 19.dp
                     )
             ) {
 
@@ -203,6 +189,7 @@ fun TaskSelectionCard(
                                 Color(0xFF1B2336),
 
                             fontSize = 18.sp,
+                            lineHeight = 27.sp,
 
                             fontWeight =
                                 FontWeight.Bold
@@ -226,6 +213,7 @@ fun TaskSelectionCard(
                                 Color(0xFF5B647B),
 
                             fontSize = 14.sp,
+                            lineHeight = 27.sp,
 
                             fontWeight =
                                 FontWeight.Medium
@@ -271,14 +259,14 @@ fun TaskSelectionCard(
                                     Color(0xFFB1C4FF),
 
                                 modifier = Modifier
-                                    .size(16.dp)
+                                    .size(14.dp)
                             )
                         }
                     }
                 }
 
                 Spacer(
-                    modifier = Modifier.height(16.dp)
+                    modifier = Modifier.height(7.dp)
                 )
 
                 /*
