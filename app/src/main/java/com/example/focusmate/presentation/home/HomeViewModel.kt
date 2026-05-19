@@ -119,20 +119,6 @@ class HomeViewModel @Inject constructor(
 
                         /*
                         ============================
-                        IN PROGRESS
-                        tetap in progress
-                        ============================
-                        */
-
-                        else if (
-                            task.status == "In Progress"
-                        ) {
-
-                            task
-                        }
-
-                        /*
-                        ============================
                         OVERDUE
                         ============================
                         */
@@ -182,13 +168,26 @@ class HomeViewModel @Inject constructor(
 
                 /*
                 ================================
+                FILTER COMPLETED TASKS
+                ================================
+                */
+
+                val availableTasks =
+
+                    updatedTasks.filter { task ->
+
+                        task.status != "Completed"
+                    }
+
+                /*
+                ================================
                 RETURN UI STATE
                 ================================
                 */
 
                 HomeUiState(
 
-                    tasks = updatedTasks,
+                    tasks = availableTasks,
 
                     motivation = quote
                 )
@@ -223,8 +222,6 @@ class HomeViewModel @Inject constructor(
             if (
 
                 task.status == "Completed"
-                ||
-                task.status == "In Progress"
                 ||
                 task.status == "Overdue"
 

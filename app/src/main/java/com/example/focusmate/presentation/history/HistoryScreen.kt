@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.focusmate.domain.model.FocusSession
+import com.example.focusmate.presentation.components.StatusBadge
 import com.example.focusmate.presentation.theme.BackgroundDark
 
 private val HistoryPanel =
@@ -79,9 +80,6 @@ fun HistoryScreen(
             uiState.sessions
                 .filter { session ->
                     session.isCompleted
-                }
-                .ifEmpty {
-                    sampleHistorySessions()
                 }
         }
 
@@ -418,7 +416,7 @@ private fun HistorySessionCard(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(115.dp)
+            .height(132.dp)
     ) {
 
         Column(
@@ -439,7 +437,9 @@ private fun HistorySessionCard(
             )
 
             Row(
-                modifier = Modifier.height(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(28.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -457,6 +457,14 @@ private fun HistorySessionCard(
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                     fontWeight = FontWeight.Normal
+                )
+
+                Spacer(
+                    modifier = Modifier.weight(1f)
+                )
+
+                StatusBadge(
+                    status = session.sessionStatus
                 )
             }
 
@@ -480,43 +488,4 @@ private fun FocusSession.timeRange(): String {
     } else {
         "$startTime - $endTime"
     }
-}
-
-private fun sampleHistorySessions(): List<FocusSession> {
-
-    return listOf(
-        FocusSession(
-            id = -1,
-            taskTitle = "Read Chapter 5 - History",
-            durationMinutes = 45,
-            remainingSeconds = 0,
-            totalSeconds = 45 * 60,
-            isCompleted = true,
-            date = "Today",
-            startTime = "02:00 PM",
-            endTime = "02:45 PM"
-        ),
-        FocusSession(
-            id = -2,
-            taskTitle = "Complete Math Assignment",
-            durationMinutes = 25,
-            remainingSeconds = 0,
-            totalSeconds = 25 * 60,
-            isCompleted = true,
-            date = "Today",
-            startTime = "10:30 AM",
-            endTime = "10:55 AM"
-        ),
-        FocusSession(
-            id = -3,
-            taskTitle = "Complete Math Assignment",
-            durationMinutes = 25,
-            remainingSeconds = 0,
-            totalSeconds = 25 * 60,
-            isCompleted = true,
-            date = "Today",
-            startTime = "09:00 AM",
-            endTime = "09:25 AM"
-        )
-    )
 }

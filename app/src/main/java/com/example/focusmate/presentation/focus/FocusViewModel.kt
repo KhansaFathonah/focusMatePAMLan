@@ -2,7 +2,9 @@ package com.example.focusmate.presentation.focus
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.focusmate.domain.model.FocusSession
 import com.example.focusmate.domain.model.Task
+import com.example.focusmate.domain.usecase.focus.StartFocusSessionUseCase
 import com.example.focusmate.domain.usecase.task.GetAllTasksUseCase
 import com.example.focusmate.domain.usecase.task.UpdateTaskStatusUseCase
 import com.example.focusmate.utils.TaskUtils
@@ -15,6 +17,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,7 +29,10 @@ class FocusViewModel @Inject constructor(
     GetAllTasksUseCase,
 
     private val updateTaskStatusUseCase:
-    UpdateTaskStatusUseCase
+    UpdateTaskStatusUseCase,
+
+    private val startFocusSessionUseCase:
+    StartFocusSessionUseCase
 
 ) : ViewModel() {
 
@@ -97,20 +105,6 @@ class FocusViewModel @Inject constructor(
 
                             if (
                                 task.status == "Completed"
-                            ) {
-
-                                task
-                            }
-
-                            /*
-                            ========================
-                            IN PROGRESS
-                            tetap in progress
-                            ========================
-                            */
-
-                            else if (
-                                task.status == "In Progress"
                             ) {
 
                                 task
@@ -237,19 +231,6 @@ class FocusViewModel @Inject constructor(
 
             /*
             ================================
-            SKIP IN PROGRESS
-            ================================
-            */
-
-            if (
-                task.status == "In Progress"
-            ) {
-
-                return@forEach
-            }
-
-            /*
-            ================================
             ALREADY OVERDUE
             ================================
             */
@@ -298,12 +279,23 @@ class FocusViewModel @Inject constructor(
         val durationSeconds =
             _uiState.value.selectedDuration * 60
 
+        val isOverdue =
+            task.status == "Overdue" ||
+                    TimeUtils.isTaskOverdue(
+                        task.deadline
+                    )
+
         viewModelScope.launch {
 
             updateTaskStatusUseCase(
 
                 task.copy(
-                    status = "In Progress"
+                    status =
+                        if (isOverdue) {
+                            "Overdue"
+                        } else {
+                            "In Progress"
+                        }
                 )
             )
         }
@@ -316,7 +308,8 @@ class FocusViewModel @Inject constructor(
                 isCompleted = false,
                 remainingSeconds = durationSeconds,
                 totalSeconds = durationSeconds,
-                progress = 1f
+                progress = 1f,
+                sessionStartedAtMillis = System.currentTimeMillis()
             )
         }
 
@@ -337,7 +330,8 @@ class FocusViewModel @Inject constructor(
                 isCompleted = false,
                 remainingSeconds = durationSeconds,
                 totalSeconds = durationSeconds,
-                progress = 1f
+                progress = 1f,
+                sessionStartedAtMillis = System.currentTimeMillis()
             )
         }
 
@@ -387,11 +381,123 @@ class FocusViewModel @Inject constructor(
                 }
 
                 if (_uiState.value.isCompleted) {
+                    finishCurrentSession(
+                        _uiState.value
+                    )
+                    resetSession()
                     timerJob?.cancel()
                     break
                 }
             }
         }
+    }
+
+    private suspend fun finishCurrentSession(
+        state: FocusUiState
+    ) {
+
+        val selectedTask =
+            state.selectedTask
+
+        selectedTask?.let { task ->
+
+            updateTaskStatusUseCase(
+
+                task.copy(
+                    status = "Completed"
+                )
+            )
+        }
+
+        val completedAt =
+            System.currentTimeMillis()
+
+        val startedAt =
+            state.sessionStartedAtMillis
+                ?: completedAt - (state.totalSeconds * 1000L)
+
+        val elapsedSeconds =
+            ((completedAt - startedAt) / 1000L)
+                .toInt()
+                .coerceAtLeast(1)
+
+        val resultStatus =
+            if (
+                selectedTask != null &&
+                (
+                        selectedTask.status == "Overdue" ||
+                                TimeUtils.isTaskOverdue(
+                                    selectedTask.deadline
+                                )
+                        )
+            ) {
+                "Overdue"
+            } else {
+                "Success"
+            }
+
+        startFocusSessionUseCase(
+
+            FocusSession(
+                taskId = selectedTask?.id,
+                taskTitle = selectedTask?.title,
+                durationMinutes = ((elapsedSeconds + 59) / 60)
+                    .coerceAtLeast(1),
+                remainingSeconds = 0,
+                totalSeconds = elapsedSeconds,
+                isRunning = false,
+                isCompleted = true,
+                sessionStatus = resultStatus,
+                date = formatDate(completedAt),
+                startTime = formatTime(startedAt),
+                endTime = formatTime(completedAt)
+            )
+        )
+    }
+
+    fun stopCurrentSession() {
+
+        timerJob?.cancel()
+        timerJob = null
+
+        viewModelScope.launch {
+
+            val currentState =
+                _uiState.value
+
+            if (currentState.isRunning) {
+
+                finishCurrentSession(
+                    currentState
+                )
+            }
+
+            resetSession()
+        }
+    }
+
+    private fun formatDate(
+        timeMillis: Long
+    ): String {
+
+        return SimpleDateFormat(
+            "dd MMM yyyy",
+            Locale.getDefault()
+        ).format(
+            Date(timeMillis)
+        )
+    }
+
+    private fun formatTime(
+        timeMillis: Long
+    ): String {
+
+        return SimpleDateFormat(
+            "hh:mm a",
+            Locale.getDefault()
+        ).format(
+            Date(timeMillis)
+        )
     }
 
     fun pauseOrResumeSession() {
@@ -557,7 +663,9 @@ class FocusViewModel @Inject constructor(
 
                 totalSeconds = 25 * 60,
 
-                progress = 1f
+                progress = 1f,
+
+                sessionStartedAtMillis = null
             )
         }
     }

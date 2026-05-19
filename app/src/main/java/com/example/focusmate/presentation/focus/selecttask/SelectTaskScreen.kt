@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Icon
@@ -27,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.focusmate.domain.model.Task
 import com.example.focusmate.presentation.components.TaskSelectionCard
 import com.example.focusmate.presentation.focus.FocusViewModel
 import com.example.focusmate.presentation.navigation.Screen
@@ -52,7 +53,7 @@ fun SelectTaskScreen(
     viewModel.uiState.collectAsState()
 
     val displayTasks =
-        sampleSelectTasks()
+        uiState.tasks
 
     /*
     ====================================
@@ -155,59 +156,92 @@ fun SelectTaskScreen(
             ====================================
             */
 
-            Column(
+            if (displayTasks.isEmpty()) {
 
-                modifier = Modifier
-                    .weight(1f),
+                Column(
 
-                verticalArrangement =
-                    Arrangement.spacedBy(20.dp)
-            ) {
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
 
-                displayTasks.forEach { task ->
+                    horizontalAlignment =
+                        Alignment.CenterHorizontally,
 
-                    TaskSelectionCard(
+                    verticalArrangement =
+                        Arrangement.Center
+                ) {
 
-                        task = task,
+                    Text(
 
-                        isSelected =
+                        text = "No tasks available",
 
-                            uiState.selectedTask?.id
-                                    ==
-                                    task.id,
+                        color = Color.White,
 
-                        onClick = {
+                        fontSize = 18.sp,
 
-                            viewModel.selectTask(
-                                task
-                            )
-
-                            navController.navigate(
-                                Screen.StartFocus.route
-                            )
-                        }
+                        fontWeight =
+                            FontWeight.Bold
                     )
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    Text(
+
+                        text = "Create a task from Home first.",
+
+                        color = Color.White.copy(alpha = 0.6f),
+
+                        fontSize = 14.sp
+                    )
+                }
+
+            } else {
+
+                LazyColumn(
+
+                    modifier = Modifier
+                        .weight(1f),
+
+                    verticalArrangement =
+                        Arrangement.spacedBy(20.dp)
+                ) {
+
+                    items(
+
+                        items = displayTasks,
+
+                        key = { task ->
+                            task.id
+                        }
+
+                    ) { task ->
+
+                        TaskSelectionCard(
+
+                            task = task,
+
+                            isSelected =
+
+                                uiState.selectedTask?.id
+                                        ==
+                                        task.id,
+
+                            onClick = {
+
+                                viewModel.selectTask(
+                                    task
+                                )
+
+                                navController.navigate(
+                                    Screen.StartFocus.route
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
     }
-}
-
-private fun sampleSelectTasks(): List<Task> {
-
-    return listOf(
-        Task(
-            id = -1,
-            title = "Complete Math Assignment",
-            deadline = "Today, 5:00 PM",
-            status = "In Progress",
-            focusMinutes = 50
-        ),
-        Task(
-            id = -2,
-            title = "Review Chemistry Notes",
-            deadline = "Tomorrow, 12:00 PM",
-            status = "Not Started"
-        )
-    )
 }

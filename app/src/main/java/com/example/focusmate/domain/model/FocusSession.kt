@@ -49,6 +49,8 @@ data class FocusSession(
 
     val isCompleted: Boolean = false,
 
+    val sessionStatus: String = "Success",
+
     /*
     ====================================
     TIME

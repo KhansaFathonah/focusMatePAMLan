@@ -25,7 +25,7 @@ import com.example.focusmate.data.local.entity.TaskEntity
     ====================================
     */
 
-    version = 2,
+    version = 3,
 
     exportSchema = false
 )

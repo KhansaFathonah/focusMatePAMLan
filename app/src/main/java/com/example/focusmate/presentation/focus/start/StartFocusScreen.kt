@@ -137,7 +137,7 @@ fun StartFocusScreen(
 
                 ActiveFocusControls(
                     onStopClick = {
-                        viewModel.resetSession()
+                        viewModel.stopCurrentSession()
                         navController.popBackStack()
                     },
                     onExtendClick = {

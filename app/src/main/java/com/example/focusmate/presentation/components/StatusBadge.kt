@@ -35,6 +35,9 @@ fun StatusBadge(
         "Completed" ->
             Color(0xFF2E7D32)
 
+        "Success" ->
+            Color(0xFF2E7D32)
+
         "Overdue" ->
             Color(0xFFE05656)
 
