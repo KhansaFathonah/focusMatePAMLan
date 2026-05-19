@@ -5,9 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.focusmate.presentation.about.AboutScreen
+import com.example.focusmate.presentation.settingsPage.about.AboutScreen
 import com.example.focusmate.presentation.addtask.AddTaskScreen
-import com.example.focusmate.presentation.backup.BackupScreen
+import com.example.focusmate.presentation.settingsPage.backup.BackupScreen
 import com.example.focusmate.presentation.focus.active.ActiveSessionScreen
 import com.example.focusmate.presentation.focus.mode.FocusModeScreen
 import com.example.focusmate.presentation.focus.selecttask.SelectTaskScreen
@@ -15,9 +15,9 @@ import com.example.focusmate.presentation.focus.complete.SessionCompleteScreen
 import com.example.focusmate.presentation.focus.start.StartFocusScreen
 import com.example.focusmate.presentation.history.HistoryScreen
 import com.example.focusmate.presentation.home.HomeScreen
-import com.example.focusmate.presentation.notification.NotificationScreen
+import com.example.focusmate.presentation.settingsPage.notification.NotificationScreen
 import com.example.focusmate.presentation.progress.ProgressScreen
-import com.example.focusmate.presentation.settings.SettingsScreen
+import com.example.focusmate.presentation.settingsPage.settings.SettingsScreen
 import com.example.focusmate.presentation.splash.SplashScreen
 
 @Composable

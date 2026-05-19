@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.about
+package com.example.focusmate.presentation.settingsPage.backup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,7 +12,7 @@ import com.example.focusmate.presentation.theme.BackgroundDark
 import com.example.focusmate.presentation.theme.TextPrimary
 
 @Composable
-fun AboutScreen(
+fun BackupScreen(
     navController: NavController
 ) {
 
@@ -25,7 +25,7 @@ fun AboutScreen(
     ) {
 
         Text(
-            text = "About Screen",
+            text = "Backup Screen",
             color = TextPrimary
         )
     }

@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.notification
+package com.example.focusmate.presentation.settingsPage.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,7 +12,7 @@ import com.example.focusmate.presentation.theme.BackgroundDark
 import com.example.focusmate.presentation.theme.TextPrimary
 
 @Composable
-fun NotificationScreen(
+fun SettingsScreen(
     navController: NavController
 ) {
 
@@ -25,7 +25,7 @@ fun NotificationScreen(
     ) {
 
         Text(
-            text = "Notification Screen",
+            text = "Settings Screen",
             color = TextPrimary
         )
     }
