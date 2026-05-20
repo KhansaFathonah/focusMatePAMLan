@@ -26,6 +26,45 @@ android {
 
         testInstrumentationRunner =
             "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["appLabel"] =
+            "FocusMate"
+    }
+
+    flavorDimensions +=
+        "branch"
+
+    productFlavors {
+
+        create("mainBranch") {
+
+            dimension =
+                "branch"
+
+            applicationIdSuffix =
+                ".main"
+
+            versionNameSuffix =
+                "-main"
+
+            manifestPlaceholders["appLabel"] =
+                "FocusMate Main"
+        }
+
+        create("ryanBranch") {
+
+            dimension =
+                "branch"
+
+            applicationIdSuffix =
+                ".ryan"
+
+            versionNameSuffix =
+                "-ryan"
+
+            manifestPlaceholders["appLabel"] =
+                "FocusMate Ryan"
+        }
     }
 
     buildTypes {

@@ -59,26 +59,22 @@ fun ProgressScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     val completedTasks =
-        if (uiState.totalTasks == 0) 1 else uiState.completedTasks
+        uiState.completedTasks
 
     val totalTasks =
-        if (uiState.totalTasks == 0) 4 else uiState.totalTasks
+        uiState.totalTasks
 
     val totalMinutes =
-        if (uiState.totalFocusMinutes == 0) 125 else uiState.totalFocusMinutes
+        uiState.totalFocusMinutes
 
     val totalSessions =
-        if (uiState.totalSessions == 0) 14 else uiState.totalSessions
+        uiState.totalSessions
 
     val weekTasks =
-        if (uiState.totalTasks == 0) 1 else uiState.weeklyMinutes.count { it > 0 }
+        uiState.weeklyMinutes.sum()
 
     val weeklyValues =
-        if (uiState.sessions.isEmpty()) {
-            listOf(65, 25, 55, 55, 70, 58, 95)
-        } else {
-            uiState.weeklyMinutes
-        }
+        uiState.weeklyMinutes
 
     Box(
         modifier = Modifier
