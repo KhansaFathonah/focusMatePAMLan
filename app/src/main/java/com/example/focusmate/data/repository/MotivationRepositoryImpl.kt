@@ -3,15 +3,21 @@ package com.example.focusmate.data.repository
 import com.example.focusmate.data.local.dao.MotivationDao
 import com.example.focusmate.data.local.entity.MotivationEntity
 import com.example.focusmate.data.mapper.toDomain
+import com.example.focusmate.data.remote.api.MotivationApi
 import com.example.focusmate.domain.model.Motivation
 import com.example.focusmate.domain.repository.MotivationRepository
+import com.example.focusmate.utils.NetworkObserver
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class MotivationRepositoryImpl @Inject constructor(
 
-    private val motivationDao: MotivationDao
+    private val motivationDao: MotivationDao,
+
+    private val motivationApi: MotivationApi,
+
+    private val networkObserver: NetworkObserver
 
 ) : MotivationRepository {
 
@@ -46,21 +52,36 @@ class MotivationRepositoryImpl @Inject constructor(
 
                 id = quote.id,
 
-                quote = quote.quote
+                quote = quote.quote,
+
+                author = quote.author
             )
         )
     }
 
     override suspend fun refreshQuote() {
 
-        /*
-        ====================================
-        API QUOTE
-        ====================================
+        if (!networkObserver.hasInternetAccess()) {
+            return
+        }
 
-        nanti diisi API call.
-        sekarang kosong dulu
-        supaya app bisa jalan.
-        */
+        val quote =
+            runCatching {
+                motivationApi
+                    .getRandomQuote()
+                    .firstOrNull()
+            }.getOrNull()
+                ?: return
+
+        if (quote.content.isBlank()) {
+            return
+        }
+
+        motivationDao.insertQuote(
+            MotivationEntity(
+                quote = quote.content,
+                author = quote.author
+            )
+        )
     }
 }

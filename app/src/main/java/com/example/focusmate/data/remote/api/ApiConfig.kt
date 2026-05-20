@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object ApiConfig {
 
     private const val BASE_URL =
-        "https://zenquotes.io/"
+        "http://api.quotable.io/"
 
     fun provideApi(): MotivationApi {
 

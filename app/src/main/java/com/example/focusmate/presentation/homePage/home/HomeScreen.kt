@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,6 +67,10 @@ fun HomeScreen(
 
     val greeting =
         getGreetingMessage()
+
+    val motivationQuote =
+        uiState.motivation?.quote
+            ?: "Let's make today productive"
 
     /*
     =========================================
@@ -190,12 +195,16 @@ fun HomeScreen(
                         Text(
 
                             text =
-                                "Let's make today productive",
+                                motivationQuote,
 
                             color =
                                 Color.LightGray,
 
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+
+                            maxLines = 2,
+
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -211,9 +220,7 @@ fun HomeScreen(
                     MotivationCard(
 
                         quote =
-
-                            uiState.motivation?.quote
-                                ?: "Let's make today productive"
+                            motivationQuote
                     )
                 }
 
