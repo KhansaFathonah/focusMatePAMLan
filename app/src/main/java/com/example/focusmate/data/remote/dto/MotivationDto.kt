@@ -2,7 +2,7 @@ package com.example.focusmate.data.remote.dto
 
 data class MotivationDto(
 
-    val q: String,
+    val content: String,
 
-    val a: String
+    val author: String
 )
