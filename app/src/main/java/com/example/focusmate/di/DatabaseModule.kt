@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.focusmate.data.local.dao.FocusSessionDao
 import com.example.focusmate.data.local.dao.MotivationDao
+import com.example.focusmate.data.local.dao.SettingsDao
 import com.example.focusmate.data.local.dao.TaskDao
 import com.example.focusmate.data.local.database.FocusMateDatabase
 import dagger.Module
@@ -102,5 +103,22 @@ object DatabaseModule {
     ): FocusSessionDao {
 
         return database.focusSessionDao()
+    }
+
+    /*
+    ========================================
+    SETTINGS DAO
+    ========================================
+    */
+
+    @Provides
+    @Singleton
+    fun provideSettingsDao(
+
+        database: FocusMateDatabase
+
+    ): SettingsDao {
+
+        return database.settingsDao()
     }
 }

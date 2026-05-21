@@ -7,7 +7,9 @@ sealed class AddTaskEvent {
     ) : AddTaskEvent()
 
     data class OnDeadlineChange(
-        val deadline: String
+        val deadline: String,
+
+        val deadlineMillis: Long
     ) : AddTaskEvent()
 
     data object SaveTask :

@@ -6,5 +6,7 @@ data class Settings(
 
     val autoBackupEnabled: Boolean,
 
-    val backupFrequency: String
+    val backupFrequency: String,
+
+    val username: String = ""
 )

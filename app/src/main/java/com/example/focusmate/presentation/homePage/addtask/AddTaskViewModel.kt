@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,15 +56,27 @@ class AddTaskViewModel @Inject constructor(
 
                 _uiState.update {
 
+                    val isDeadlineValid =
+                        it.deadlineMillis?.let { deadlineMillis ->
+                            isTodayOrFuture(deadlineMillis)
+                        } == true
+
                     it.copy(
 
                         title = event.title,
+
+                        errorMessage =
+                            if (isDeadlineValid || it.deadline.isBlank()) {
+                                null
+                            } else {
+                                "Deadline must be today or later"
+                            },
 
                         isSaveEnabled =
 
                             event.title.isNotBlank()
                                     &&
-                                    it.deadline.isNotBlank()
+                                    isDeadlineValid
                     )
                 }
             }
@@ -78,15 +91,30 @@ class AddTaskViewModel @Inject constructor(
 
                 _uiState.update {
 
+                    val isDeadlineValid =
+                        isTodayOrFuture(
+                            event.deadlineMillis
+                        )
+
                     it.copy(
 
                         deadline = event.deadline,
+
+                        deadlineMillis =
+                            event.deadlineMillis,
+
+                        errorMessage =
+                            if (isDeadlineValid) {
+                                null
+                            } else {
+                                "Deadline must be today or later"
+                            },
 
                         isSaveEnabled =
 
                             it.title.isNotBlank()
                                     &&
-                                    event.deadline.isNotBlank()
+                                    isDeadlineValid
                     )
                 }
             }
@@ -125,6 +153,10 @@ class AddTaskViewModel @Inject constructor(
 
             if (
                 !currentState.isSaveEnabled
+                ||
+                currentState.deadlineMillis?.let {
+                    !isTodayOrFuture(it)
+                } != false
             ) {
 
                 return@launch
@@ -164,5 +196,22 @@ class AddTaskViewModel @Inject constructor(
             _uiState.value =
                 AddTaskUiState()
         }
+    }
+
+    private fun isTodayOrFuture(
+        deadlineMillis: Long
+    ): Boolean {
+
+        val todayStart =
+            Calendar.getInstance()
+                .apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                .timeInMillis
+
+        return deadlineMillis >= todayStart
     }
 }

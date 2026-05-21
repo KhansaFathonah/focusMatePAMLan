@@ -8,7 +8,8 @@ fun SettingsEntity.toDomain(): Settings {
     return Settings(
         notificationsEnabled = notificationsEnabled,
         autoBackupEnabled = autoBackupEnabled,
-        backupFrequency = backupFrequency
+        backupFrequency = backupFrequency,
+        username = username
     )
 }
 
@@ -17,6 +18,7 @@ fun Settings.toEntity(): SettingsEntity {
     return SettingsEntity(
         notificationsEnabled = notificationsEnabled,
         autoBackupEnabled = autoBackupEnabled,
-        backupFrequency = backupFrequency
+        backupFrequency = backupFrequency,
+        username = username
     )
 }

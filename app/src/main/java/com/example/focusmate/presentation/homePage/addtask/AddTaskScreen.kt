@@ -81,6 +81,18 @@ fun AddTaskScreen(
             Calendar.getInstance()
         }
 
+    val todayStartMillis =
+        remember {
+            Calendar.getInstance()
+                .apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                .timeInMillis
+        }
+
     /*
     =========================================
     SCREEN
@@ -355,7 +367,9 @@ fun AddTaskScreen(
                                         AddTaskEvent
                                             .OnDeadlineChange(
 
-                                                formattedDate
+                                                formattedDate,
+
+                                                calendar.timeInMillis
                                             )
                                     )
                                 },
@@ -385,7 +399,12 @@ fun AddTaskScreen(
                             Calendar.DAY_OF_MONTH
                         )
 
-                    ).show()
+                    ).apply {
+
+                        datePicker.minDate =
+                            todayStartMillis
+
+                    }.show()
                 }
         ) {
 
@@ -434,6 +453,19 @@ fun AddTaskScreen(
                         disabledPlaceholderColor =
                             Color.Gray
                     )
+            )
+        }
+
+        uiState.errorMessage?.let { errorMessage ->
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            Text(
+                text = errorMessage,
+                color = Color(0xFFFFB4AB),
+                fontSize = 13.sp
             )
         }
 

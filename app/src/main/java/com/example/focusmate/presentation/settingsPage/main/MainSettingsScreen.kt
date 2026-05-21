@@ -13,14 +13,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudQueue
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.focusmate.presentation.components.BottomNavbar
 import com.example.focusmate.presentation.navigation.Screen
@@ -32,8 +42,84 @@ import com.example.focusmate.presentation.theme.TextSecondary
 @Composable
 fun MainSettingsScreen(
 
-    navController: NavController
+    navController: NavController,
+
+    viewModel: MainSettingsViewModel =
+        hiltViewModel()
 ) {
+
+    val settings by
+    viewModel.settings.collectAsState()
+
+    var showUsernameDialog by
+    remember {
+        mutableStateOf(false)
+    }
+
+    var usernameInput by
+    remember(settings.username) {
+        mutableStateOf(settings.username)
+    }
+
+    if (showUsernameDialog) {
+
+        AlertDialog(
+
+            onDismissRequest = {
+                showUsernameDialog = false
+            },
+
+            title = {
+                Text(
+                    text = "Username"
+                )
+            },
+
+            text = {
+                OutlinedTextField(
+                    value = usernameInput,
+                    onValueChange = {
+                        usernameInput = it
+                    },
+                    singleLine = true,
+                    label = {
+                        Text(
+                            text = "Name"
+                        )
+                    }
+                )
+            },
+
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.updateUsername(
+                            usernameInput
+                        )
+
+                        showUsernameDialog = false
+                    }
+                ) {
+                    Text(
+                        text = "Save"
+                    )
+                }
+            },
+
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        usernameInput = settings.username
+                        showUsernameDialog = false
+                    }
+                ) {
+                    Text(
+                        text = "Cancel"
+                    )
+                }
+            }
+        )
+    }
 
     /*
     ====================================
@@ -141,6 +227,34 @@ fun MainSettingsScreen(
                     verticalArrangement =
                         Arrangement.spacedBy(18.dp)
                 ) {
+
+                    /*
+                    ================================
+                    USERNAME
+                    ================================
+                    */
+
+                    SettingsMainMenuCard(
+
+                        title =
+                            if (settings.username.isBlank()) {
+                                "Username"
+                            } else {
+                                "Username: ${settings.username}"
+                            },
+
+                        icon =
+                            Icons.Outlined.Person,
+
+                        onClick = {
+
+                            usernameInput =
+                                settings.username
+
+                            showUsernameDialog =
+                                true
+                        }
+                    )
 
                     /*
                     ================================

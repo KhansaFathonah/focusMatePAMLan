@@ -13,5 +13,7 @@ data class SettingsEntity(
 
     val autoBackupEnabled: Boolean = true,
 
-    val backupFrequency: String = "Daily"
+    val backupFrequency: String = "Daily",
+
+    val username: String = ""
 )

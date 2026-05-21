@@ -4,7 +4,7 @@ import com.example.focusmate.domain.model.Settings
 import com.example.focusmate.domain.repository.SettingsRepository
 import javax.inject.Inject
 
-class UpdateNotificationUseCase @Inject constructor(
+class UpdateUsernameUseCase @Inject constructor(
 
     private val repository: SettingsRepository
 ) {

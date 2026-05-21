@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.focusmate.domain.model.Task
 import com.example.focusmate.domain.usecase.motivation.GetRandomQuoteUseCase
 import com.example.focusmate.domain.usecase.motivation.RefreshQuoteUseCase
+import com.example.focusmate.domain.usecase.settings.GetSettingsUseCase
 import com.example.focusmate.domain.usecase.task.DeleteTaskUseCase
 import com.example.focusmate.domain.usecase.task.GetAllTasksUseCase
 import com.example.focusmate.domain.usecase.task.UpdateTaskStatusUseCase
@@ -31,6 +32,9 @@ class HomeViewModel @Inject constructor(
 
     private val refreshQuoteUseCase:
     RefreshQuoteUseCase,
+
+    private val getSettingsUseCase:
+    GetSettingsUseCase,
 
     private val updateTaskStatusUseCase:
     UpdateTaskStatusUseCase
@@ -81,9 +85,11 @@ class HomeViewModel @Inject constructor(
 
                 getAllTasksUseCase(),
 
-                getRandomQuoteUseCase()
+                getRandomQuoteUseCase(),
 
-            ) { tasks, quote ->
+                getSettingsUseCase()
+
+            ) { tasks, quote, settings ->
 
                 /*
                 ================================
@@ -190,7 +196,10 @@ class HomeViewModel @Inject constructor(
 
                     tasks = updatedTasks,
 
-                    motivation = quote
+                    motivation = quote,
+
+                    username =
+                        settings?.username.orEmpty()
                 )
 
             }.collect { state ->

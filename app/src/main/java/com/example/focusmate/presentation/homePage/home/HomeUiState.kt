@@ -9,5 +9,7 @@ data class HomeUiState(
 
     val tasks: List<Task> = emptyList(),
 
-    val motivation: Motivation? = null
+    val motivation: Motivation? = null,
+
+    val username: String = ""
 )

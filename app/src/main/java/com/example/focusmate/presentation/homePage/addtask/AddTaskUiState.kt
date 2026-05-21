@@ -6,5 +6,9 @@ data class AddTaskUiState(
 
     val deadline: String = "",
 
+    val deadlineMillis: Long? = null,
+
+    val errorMessage: String? = null,
+
     val isSaveEnabled: Boolean = false
 )

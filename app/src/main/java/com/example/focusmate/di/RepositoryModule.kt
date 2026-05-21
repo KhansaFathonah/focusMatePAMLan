@@ -2,9 +2,11 @@ package com.example.focusmate.di
 
 import com.example.focusmate.data.repository.FocusRepositoryImpl
 import com.example.focusmate.data.repository.MotivationRepositoryImpl
+import com.example.focusmate.data.repository.SettingsRepositoryImpl
 import com.example.focusmate.data.repository.TaskRepositoryImpl
 import com.example.focusmate.domain.repository.FocusRepository
 import com.example.focusmate.domain.repository.MotivationRepository
+import com.example.focusmate.domain.repository.SettingsRepository
 import com.example.focusmate.domain.repository.TaskRepository
 import dagger.Binds
 import dagger.Module
@@ -57,4 +59,18 @@ abstract class RepositoryModule {
         repositoryImpl: FocusRepositoryImpl
 
     ): FocusRepository
+
+    /*
+    ========================================
+    SETTINGS REPOSITORY
+    ========================================
+    */
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+
+        repositoryImpl: SettingsRepositoryImpl
+
+    ): SettingsRepository
 }
