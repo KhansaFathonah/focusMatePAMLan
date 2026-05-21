@@ -66,7 +66,7 @@ fun FocusModeScreen(
 
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 33.dp),
 
             horizontalAlignment =
                 Alignment.CenterHorizontally
@@ -79,7 +79,7 @@ fun FocusModeScreen(
             */
 
             Spacer(
-                modifier = Modifier.height(60.dp)
+                modifier = Modifier.height(100.dp)
             )
 
             /*
@@ -98,7 +98,7 @@ fun FocusModeScreen(
                     "Focus Logo",
 
                 modifier = Modifier
-                    .size(108.dp)
+                    .size(82.dp)
             )
 
             /*
@@ -108,7 +108,7 @@ fun FocusModeScreen(
             */
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier = Modifier.height(0.dp)
             )
 
             /*
@@ -186,7 +186,7 @@ fun FocusModeScreen(
             */
 
             Spacer(
-                modifier = Modifier.height(42.dp)
+                modifier = Modifier.height(58.dp)
             )
 
             /*
@@ -210,6 +210,10 @@ fun FocusModeScreen(
 
                 onClick = {
 
+                    viewModel.setQuickFocus(
+                        false
+                    )
+
                     navController.navigate(
                         Screen.SelectTask.route
                     )
@@ -223,7 +227,7 @@ fun FocusModeScreen(
             */
 
             Spacer(
-                modifier = Modifier.height(20.dp)
+                modifier = Modifier.height(25.dp)
             )
 
             /*
@@ -247,6 +251,10 @@ fun FocusModeScreen(
 
                 onClick = {
 
+                    viewModel.setQuickFocus(
+                        true
+                    )
+
                     navController.navigate(
                         Screen.StartFocus.route
                     )
@@ -260,7 +268,7 @@ fun FocusModeScreen(
             */
 
             Spacer(
-                modifier = Modifier.height(34.dp)
+                modifier = Modifier.height(29.dp)
             )
 
             /*
@@ -302,7 +310,7 @@ fun FocusModeScreen(
 
                     horizontal = 20.dp,
 
-                    vertical = 18.dp
+                    vertical = 30.dp
                 )
         )
     }

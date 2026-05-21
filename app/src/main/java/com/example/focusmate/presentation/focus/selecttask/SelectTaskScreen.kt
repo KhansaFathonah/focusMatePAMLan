@@ -3,7 +3,6 @@ package com.example.focusmate.presentation.focus.selecttask
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,11 +12,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -25,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +33,6 @@ import com.example.focusmate.presentation.components.TaskSelectionCard
 import com.example.focusmate.presentation.focus.FocusViewModel
 import com.example.focusmate.presentation.navigation.Screen
 import com.example.focusmate.presentation.theme.BackgroundDark
-import com.example.focusmate.utils.TaskUtils
 
 @Composable
 fun SelectTaskScreen(
@@ -49,37 +43,11 @@ fun SelectTaskScreen(
         hiltViewModel()
 ) {
 
-    /*
-    ====================================
-    UI STATE
-    ====================================
-    */
-
     val uiState by
     viewModel.uiState.collectAsState()
 
-    /*
-    ====================================
-    SORT TASKS
-    overdue first
-    nearest deadline
-    ====================================
-    */
-
-    val sortedTasks = remember(
+    val displayTasks =
         uiState.tasks
-    ) {
-
-        TaskUtils.sortTasksByPriority(
-            uiState.tasks
-        )
-    }
-
-    /*
-    ====================================
-    SCREEN
-    ====================================
-    */
 
     Scaffold(
 
@@ -99,18 +67,11 @@ fun SelectTaskScreen(
                     paddingValues
                 )
                 .padding(
-
-                    horizontal = 24.dp,
-                    vertical = 22.dp
+                    horizontal = 29.dp,
+                    vertical = 50.dp
                 )
                 .navigationBarsPadding()
         ) {
-
-            /*
-            ====================================
-            TOP BAR
-            ====================================
-            */
 
             Row(
 
@@ -121,16 +82,9 @@ fun SelectTaskScreen(
                     Alignment.CenterVertically
             ) {
 
-                /*
-                =================================
-                BACK BUTTON
-                =================================
-                */
-
                 IconButton(
 
                     onClick = {
-
                         navController.popBackStack()
                     }
                 ) {
@@ -147,12 +101,6 @@ fun SelectTaskScreen(
                     )
                 }
 
-                /*
-                =================================
-                TITLE
-                =================================
-                */
-
                 Text(
 
                     text = "Select Task",
@@ -167,123 +115,84 @@ fun SelectTaskScreen(
             }
 
             Spacer(
-                modifier = Modifier.height(28.dp)
+                modifier = Modifier.height(32.dp)
             )
 
-            /*
-            ====================================
-            TASK LIST
-            ====================================
-            */
+            if (displayTasks.isEmpty()) {
 
-            LazyColumn(
+                Column(
 
-                modifier = Modifier
-                    .weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
 
-                verticalArrangement =
-                    Arrangement.spacedBy(18.dp),
+                    horizontalAlignment =
+                        Alignment.CenterHorizontally,
 
-                contentPadding =
-                    PaddingValues(
+                    verticalArrangement =
+                        Arrangement.Center
+                ) {
 
-                        bottom = 24.dp
+                    Text(
+                        text = "No tasks available",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
                     )
-            ) {
 
-                items(
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
 
-                    items = sortedTasks,
-
-                    key = { task ->
-
-                        task.id
-                    }
-
-                ) { task ->
-
-                    TaskSelectionCard(
-
-                        task = task,
-
-                        isSelected =
-
-                            uiState.selectedTask?.id
-                                    ==
-                                    task.id,
-
-                        onClick = {
-
-                            viewModel.selectTask(
-                                task
-                            )
-                        }
+                    Text(
+                        text = "Create a task from Home first.",
+                        color = Color.White.copy(alpha = 0.6f),
+                        fontSize = 14.sp
                     )
                 }
-            }
 
-            /*
-            ====================================
-            CONTINUE BUTTON
-            ====================================
-            */
+            } else {
 
-            Button(
+                LazyColumn(
 
-                onClick = {
+                    modifier = Modifier
+                        .weight(1f),
 
-                    navController.navigate(
-                        Screen.StartFocus.route
-                    )
-                },
+                    verticalArrangement =
+                        Arrangement.spacedBy(20.dp)
+                ) {
 
-                enabled =
-                    uiState.selectedTask != null,
+                    items(
 
-                modifier = Modifier
-                    .align(
-                        Alignment.CenterHorizontally
-                    )
-                    .padding(
+                        items = displayTasks,
 
-                        top = 12.dp,
-                        bottom = 18.dp
-                    )
-                    .fillMaxWidth(0.58f)
-                    .height(56.dp),
+                        key = { task ->
+                            task.id
+                        }
 
-                shape =
-                    RoundedCornerShape(22.dp),
+                    ) { task ->
 
-                colors =
-                    ButtonDefaults.buttonColors(
+                        TaskSelectionCard(
 
-                        containerColor =
+                            task = task,
 
-                            if (
-                                uiState.selectedTask != null
-                            )
+                            isSelected =
+                                uiState.selectedTask?.id ==
+                                        task.id,
 
-                                Color(0xFFB1C4FF)
+                            onClick = {
 
-                            else
+                                viewModel.selectTask(
+                                    task
+                                )
 
-                                Color(0xFF5F6984),
-
-                        contentColor =
-                            Color(0xFF1B2336)
-                    )
-            ) {
-
-                Text(
-
-                    text = "Continue",
-
-                    fontSize = 17.sp,
-
-                    fontWeight =
-                        FontWeight.Bold
-                )
+                                navController.navigate(
+                                    Screen.StartFocus.route
+                                )
+                            }
+                        )
+                    }
+                }
             }
         }
     }

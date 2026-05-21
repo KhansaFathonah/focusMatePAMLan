@@ -35,6 +35,8 @@ data class FocusUiState(
 
     val progress: Float = 1f,
 
+    val sessionStartedAtMillis: Long? = null,
+
     /*
     ====================================
     TIMER STATUS

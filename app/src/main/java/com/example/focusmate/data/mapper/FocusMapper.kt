@@ -29,6 +29,8 @@ fun FocusSessionEntity.toDomain(): FocusSession {
 
         isCompleted = isCompleted,
 
+        sessionStatus = sessionStatus,
+
         date = date,
 
         startTime = startTime,
@@ -62,6 +64,8 @@ fun FocusSession.toEntity(): FocusSessionEntity {
         isRunning = isRunning,
 
         isCompleted = isCompleted,
+
+        sessionStatus = sessionStatus,
 
         date = date,
 

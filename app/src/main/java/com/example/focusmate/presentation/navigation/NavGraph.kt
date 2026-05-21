@@ -1,10 +1,13 @@
 package com.example.focusmate.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.focusmate.presentation.focus.FocusViewModel
 import com.example.focusmate.presentation.focus.active.ActiveSessionScreen
 import com.example.focusmate.presentation.focus.complete.SessionCompleteScreen
 import com.example.focusmate.presentation.focus.mode.FocusModeScreen
@@ -97,8 +100,12 @@ fun NavGraph(
             route = Screen.Focus.route
         ) {
 
+            val focusViewModel: FocusViewModel =
+                hiltViewModel()
+
             FocusModeScreen(
-                navController = navController
+                navController = navController,
+                viewModel = focusViewModel
             )
         }
 
@@ -112,8 +119,23 @@ fun NavGraph(
             route = Screen.SelectTask.route
         ) {
 
+            val focusBackStackEntry =
+                remember(
+                    navController
+                ) {
+                    navController.getBackStackEntry(
+                        Screen.Focus.route
+                    )
+                }
+
+            val focusViewModel: FocusViewModel =
+                hiltViewModel(
+                    focusBackStackEntry
+                )
+
             SelectTaskScreen(
-                navController = navController
+                navController = navController,
+                viewModel = focusViewModel
             )
         }
 
@@ -127,8 +149,23 @@ fun NavGraph(
             route = Screen.StartFocus.route
         ) {
 
+            val focusBackStackEntry =
+                remember(
+                    navController
+                ) {
+                    navController.getBackStackEntry(
+                        Screen.Focus.route
+                    )
+                }
+
+            val focusViewModel: FocusViewModel =
+                hiltViewModel(
+                    focusBackStackEntry
+                )
+
             StartFocusScreen(
-                navController = navController
+                navController = navController,
+                viewModel = focusViewModel
             )
         }
 
