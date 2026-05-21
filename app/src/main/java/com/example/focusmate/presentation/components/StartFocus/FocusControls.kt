@@ -1,88 +1,101 @@
-package com.example.focusmate.presentation.components.startfocus
+package com.example.focusmate.presentation.components.StartFocus
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Pause
-import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.PauseCircle
+import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.focusmate.presentation.theme.ButtonDark
+import com.example.focusmate.presentation.theme.ButtonPrimary
+import com.example.focusmate.presentation.theme.TextDark
+import com.example.focusmate.presentation.theme.TextPrimary
+import com.example.focusmate.presentation.theme.TextSecondary
 
 @Composable
 fun FocusControls(
 
     isRunning: Boolean,
 
-    isPaused: Boolean,
-
-    onPauseResumeClick: () -> Unit,
-
     onStopClick: () -> Unit,
 
-    onExtendClick: () -> Unit,
-
-    modifier: Modifier = Modifier
+    onAddTimeClick: () -> Unit
 ) {
 
     /*
     ====================================
-    CONTAINER
+    PAUSE BUTTON COLOR
+    ====================================
+    */
+
+    val pauseButtonColor by
+    animateColorAsState(
+
+        targetValue =
+
+            if (isRunning)
+
+                ButtonDark
+
+            else
+
+                ButtonPrimary,
+
+        animationSpec =
+            tween(300),
+
+        label = "pause_button"
+    )
+
+    /*
+    ====================================
+    TEXT COLOR
+    ====================================
+    */
+
+    val pauseTextColor =
+
+        if (isRunning)
+
+            TextPrimary
+
+        else
+
+            TextDark
+
+    /*
+    ====================================
+    BUTTON ROW
     ====================================
     */
 
     Row(
 
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth(),
 
         horizontalArrangement =
-            Arrangement.SpaceEvenly,
-
-        verticalAlignment =
-            Alignment.CenterVertically
+            Arrangement.spacedBy(14.dp)
     ) {
-
-        /*
-        ====================================
-        STOP BUTTON
-        ====================================
-        */
-
-        CircleControlButton(
-
-            backgroundColor =
-                Color(0xFF25345A),
-
-            icon = {
-
-                Icon(
-
-                    imageVector =
-                        Icons.Outlined.Close,
-
-                    contentDescription =
-                        "Stop Session",
-
-                    tint = Color.White
-                )
-            },
-
-            onClick = onStopClick
-        )
 
         /*
         ====================================
@@ -90,118 +103,171 @@ fun FocusControls(
         ====================================
         */
 
-        Box(
+        Row(
 
             modifier = Modifier
-                .size(92.dp)
+                .weight(1f)
+                .height(56.dp)
                 .background(
 
-                    color =
-                        Color(0xFFB1C4FF),
+                    color = pauseButtonColor,
 
                     shape =
-                        CircleShape
+                        RoundedCornerShape(18.dp)
                 )
                 .clickable {
 
-                    onPauseResumeClick()
-                },
+                    onStopClick()
+                }
+                .padding(horizontal = 18.dp),
 
-            contentAlignment =
-                Alignment.Center
+            horizontalArrangement =
+                Arrangement.Center,
+
+            verticalAlignment =
+                Alignment.CenterVertically
         ) {
+
+            /*
+            ====================================
+            ICON
+            ====================================
+            */
 
             Icon(
 
                 imageVector =
 
-                    if (
-                        isRunning &&
-                        !isPaused
-                    )
+                    if (isRunning)
 
-                        Icons.Outlined.Pause
+                        Icons.Outlined.PauseCircle
 
                     else
 
-                        Icons.Outlined.PlayArrow,
+                        Icons.Outlined.PlayCircle,
 
                 contentDescription =
                     "Pause Resume",
 
                 tint =
-                    Color(0xFF13203A),
+                    pauseTextColor
+            )
 
-                modifier = Modifier
-                    .size(42.dp)
+            /*
+            ====================================
+            SPACE
+            ====================================
+            */
+
+            Spacer(
+                modifier = Modifier.width(6.dp)
+            )
+
+            /*
+            ====================================
+            BUTTON TEXT
+            ====================================
+            */
+
+            Text(
+
+                text =
+
+                    if (isRunning)
+
+                        "Pause"
+
+                    else
+
+                        "Resume",
+
+                color =
+                    pauseTextColor,
+
+                fontSize = 17.sp,
+
+                fontWeight =
+                    FontWeight.Bold
             )
         }
 
         /*
         ====================================
-        EXTEND BUTTON
+        ADD TIME BUTTON
         ====================================
         */
 
-        CircleControlButton(
+        Row(
 
-            backgroundColor =
-                Color(0xFF25345A),
+            modifier = Modifier
+                .weight(1.15f)
+                .height(56.dp)
+                .background(
 
-            icon = {
+                    color = ButtonPrimary,
 
-                Icon(
-
-                    imageVector =
-                        Icons.Outlined.Add,
-
-                    contentDescription =
-                        "Add Time",
-
-                    tint = Color.White
+                    shape =
+                        RoundedCornerShape(18.dp)
                 )
-            },
+                .clickable {
 
-            onClick = onExtendClick
-        )
-    }
-}
+                    onAddTimeClick()
+                }
+                .padding(horizontal = 18.dp),
 
-/*
-====================================
-REUSABLE CONTROL BUTTON
-====================================
-*/
+            horizontalArrangement =
+                Arrangement.Center,
 
-@Composable
-private fun CircleControlButton(
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
 
-    backgroundColor: Color,
+            /*
+            ====================================
+            ADD ICON
+            ====================================
+            */
 
-    icon: @Composable () -> Unit,
+            Icon(
 
-    onClick: () -> Unit
-) {
+                imageVector =
+                    Icons.Outlined.Add,
 
-    Box(
+                contentDescription =
+                    "Add Time",
 
-        modifier = Modifier
-            .size(68.dp)
-            .background(
-
-                color = backgroundColor,
-
-                shape = RoundedCornerShape(22.dp)
+                tint =
+                    TextDark
             )
-            .clickable {
 
-                onClick()
-            },
+            /*
+            ====================================
+            SPACE
+            ====================================
+            */
 
-        contentAlignment =
-            Alignment.Center
-    ) {
+            Spacer(
+                modifier = Modifier.width(6.dp)
+            )
 
-        icon()
+            /*
+            ====================================
+            ADD TIME TEXT
+            ====================================
+            */
+
+            Text(
+
+                text = "10 min",
+
+                color =
+                    TextDark,
+
+                fontSize = 17.sp,
+
+                fontWeight =
+                    FontWeight.Bold
+            )
+        }
     }
 }

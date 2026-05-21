@@ -1,32 +1,24 @@
-package com.example.focusmate.presentation.components.startfocus
+package com.example.focusmate.presentation.components.StartFocus
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun AnimatedTimerRing(
 
     progress: Float,
-
-    timeText: String,
 
     modifier: Modifier = Modifier
 ) {
@@ -37,174 +29,106 @@ fun AnimatedTimerRing(
     ====================================
     */
 
-    val animatedProgress by
+    val animatedProgress = remember {
 
-    animateFloatAsState(
+        Animatable(progress)
+    }
 
-        targetValue = progress,
+    LaunchedEffect(progress) {
 
-        animationSpec = tween(
+        animatedProgress.animateTo(
 
-            durationMillis = 600,
+            targetValue = progress,
 
-            easing =
-                FastOutSlowInEasing
-        ),
+            animationSpec = tween(
 
-        label = "Timer Progress"
-    )
+                durationMillis = 450,
+
+                easing =
+                    FastOutSlowInEasing
+            )
+        )
+    }
 
     /*
     ====================================
-    CONTAINER
+    TIMER RING
     ====================================
     */
 
-    Box(
+    Canvas(
 
         modifier = modifier
-            .size(280.dp),
-
-        contentAlignment =
-            Alignment.Center
+            .size(248.dp)
     ) {
 
         /*
         ====================================
-        TIMER RING
+        STROKE WIDTH
         ====================================
         */
 
-        Canvas(
-
-            modifier = Modifier
-                .size(280.dp)
-
-        ) {
-
-            /*
-            ================================
-            STROKE WIDTH
-            ================================
-            */
-
-            val strokeWidth = 22.dp.toPx()
-
-            /*
-            ================================
-            BACKGROUND RING
-            ================================
-            */
-
-            drawArc(
-
-                color =
-                    Color(0xFF25345A),
-
-                startAngle = -90f,
-
-                sweepAngle = 360f,
-
-                useCenter = false,
-
-                topLeft = Offset.Zero,
-
-                size = Size(
-
-                    width = size.width,
-
-                    height = size.height
-                ),
-
-                style = Stroke(
-
-                    width = strokeWidth,
-
-                    cap = StrokeCap.Round
-                )
-            )
-
-            /*
-            ================================
-            ACTIVE PROGRESS
-            ================================
-            */
-
-            drawArc(
-
-                color =
-                    Color(0xFFB1C4FF),
-
-                startAngle = -90f,
-
-                sweepAngle =
-                    360f * animatedProgress,
-
-                useCenter = false,
-
-                topLeft = Offset.Zero,
-
-                size = Size(
-
-                    width = size.width,
-
-                    height = size.height
-                ),
-
-                style = Stroke(
-
-                    width = strokeWidth,
-
-                    cap = StrokeCap.Round
-                )
-            )
-        }
+        val strokeWidth =
+            12.dp.toPx()
 
         /*
         ====================================
-        CENTER CONTENT
+        BACKGROUND RING
         ====================================
         */
 
-        Column(
+        drawArc(
 
-            horizontalAlignment =
-                Alignment.CenterHorizontally
-        ) {
+            color =
+                Color(0xFF1A2D5A),
 
-            /*
-            ================================
-            TIMER TEXT
-            ================================
-            */
+            startAngle = -90f,
 
-            Text(
+            sweepAngle = 360f,
 
-                text = timeText,
+            useCenter = false,
 
-                color = Color.White,
+            style = Stroke(
 
-                fontSize = 54.sp,
+                width = strokeWidth,
 
-                fontWeight =
-                    FontWeight.Light
+                cap = StrokeCap.Round
             )
+        )
 
-            /*
-            ================================
-            SUBTITLE
-            ================================
-            */
+        /*
+        ====================================
+        ELAPSED TIME RING
+        ====================================
+        */
 
-            Text(
+        drawArc(
 
-                text = "Focus in progress...",
+            color =
+                Color(0xFFB1C4FF),
 
-                color =
-                    Color(0xFF7B86A8),
+            startAngle = -90f,
 
-                fontSize = 16.sp
+            sweepAngle =
+
+                360f *
+                        (1f - animatedProgress.value),
+
+            useCenter = false,
+
+            style = Stroke(
+
+                width = strokeWidth,
+
+                cap = StrokeCap.Round
+            ),
+
+            size = Size(
+
+                width = size.width,
+
+                height = size.height
             )
-        }
+        )
     }
 }

@@ -1,24 +1,62 @@
 package com.example.focusmate.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.focusmate.presentation.focus.active.ActiveSessionScreen
-import com.example.focusmate.presentation.focus.complete.SessionCompleteScreen
-import com.example.focusmate.presentation.focus.mode.FocusModeScreen
-import com.example.focusmate.presentation.focus.selecttask.SelectTaskScreen
-import com.example.focusmate.presentation.focus.start.StartFocusScreen
+
+/*
+========================================
+SPLASH
+========================================
+*/
+
+import com.example.focusmate.presentation.splash.SplashScreen
+
+/*
+========================================
+HOME
+========================================
+*/
+
 import com.example.focusmate.presentation.homePage.addtask.AddTaskScreen
 import com.example.focusmate.presentation.homePage.home.HomeScreen
+
+/*
+========================================
+FOCUS
+========================================
+*/
+
+import com.example.focusmate.presentation.focus.FocusViewModel
+import com.example.focusmate.presentation.focus.complete.SessionCompleteScreen
+import com.example.focusmate.presentation.focus.main.FocusModeScreen
+import com.example.focusmate.presentation.focus.withTask.ActiveSessionScreen
+import com.example.focusmate.presentation.focus.withTask.SelectDurationScreen
+import com.example.focusmate.presentation.focus.withTask.SelectTaskScreen
+
+/*
+========================================
+PROGRESS
+========================================
+*/
+
 import com.example.focusmate.presentation.progressPage.history.HistoryScreen
 import com.example.focusmate.presentation.progressPage.progress.ProgressScreen
+
+/*
+========================================
+SETTINGS
+========================================
+*/
+
 import com.example.focusmate.presentation.settingsPage.about.AboutScreen
 import com.example.focusmate.presentation.settingsPage.backup.BackupScreen
 import com.example.focusmate.presentation.settingsPage.main.MainSettingsScreen
 import com.example.focusmate.presentation.settingsPage.notification.NotificationScreen
-import com.example.focusmate.presentation.splash.SplashScreen
 
 @Composable
 fun NavGraph(
@@ -110,25 +148,55 @@ fun NavGraph(
 
         composable(
             route = Screen.SelectTask.route
-        ) {
+        ) { backStackEntry ->
+
+            val parentEntry = remember(backStackEntry) {
+
+                navController.getBackStackEntry(
+                    Screen.Focus.route
+                )
+            }
+
+            val focusViewModel:
+                    FocusViewModel =
+
+                hiltViewModel(parentEntry)
 
             SelectTaskScreen(
-                navController = navController
+
+                navController = navController,
+
+                viewModel = focusViewModel
             )
         }
 
         /*
         ========================================
-        START FOCUS
+        SELECT DURATION
         ========================================
         */
 
         composable(
             route = Screen.StartFocus.route
-        ) {
+        ) { backStackEntry ->
 
-            StartFocusScreen(
-                navController = navController
+            val parentEntry = remember(backStackEntry) {
+
+                navController.getBackStackEntry(
+                    Screen.Focus.route
+                )
+            }
+
+            val focusViewModel:
+                    FocusViewModel =
+
+                hiltViewModel(parentEntry)
+
+            SelectDurationScreen(
+
+                navController = navController,
+
+                viewModel = focusViewModel
             )
         }
 
@@ -140,10 +208,25 @@ fun NavGraph(
 
         composable(
             route = Screen.ActiveSession.route
-        ) {
+        ) { backStackEntry ->
+
+            val parentEntry = remember(backStackEntry) {
+
+                navController.getBackStackEntry(
+                    Screen.Focus.route
+                )
+            }
+
+            val focusViewModel:
+                    FocusViewModel =
+
+                hiltViewModel(parentEntry)
 
             ActiveSessionScreen(
-                navController = navController
+
+                navController = navController,
+
+                viewModel = focusViewModel
             )
         }
 
@@ -155,10 +238,25 @@ fun NavGraph(
 
         composable(
             route = Screen.SessionComplete.route
-        ) {
+        ) { backStackEntry ->
+
+            val parentEntry = remember(backStackEntry) {
+
+                navController.getBackStackEntry(
+                    Screen.Focus.route
+                )
+            }
+
+            val focusViewModel:
+                    FocusViewModel =
+
+                hiltViewModel(parentEntry)
 
             SessionCompleteScreen(
-                navController = navController
+
+                navController = navController,
+
+                viewModel = focusViewModel
             )
         }
 
@@ -194,7 +292,7 @@ fun NavGraph(
 
         /*
         ========================================
-        MAIN SETTINGS
+        SETTINGS
         ========================================
         */
 
@@ -209,7 +307,7 @@ fun NavGraph(
 
         /*
         ========================================
-        NOTIFICATION SETTINGS
+        NOTIFICATION
         ========================================
         */
 
@@ -224,7 +322,7 @@ fun NavGraph(
 
         /*
         ========================================
-        BACKUP SETTINGS
+        BACKUP
         ========================================
         */
 
@@ -239,7 +337,7 @@ fun NavGraph(
 
         /*
         ========================================
-        ABOUT APP
+        ABOUT
         ========================================
         */
 

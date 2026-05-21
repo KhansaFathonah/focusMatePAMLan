@@ -8,6 +8,8 @@ import com.example.focusmate.domain.usecase.task.UpdateTaskStatusUseCase
 import com.example.focusmate.utils.TaskUtils
 import com.example.focusmate.utils.TimeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +47,14 @@ class FocusViewModel @Inject constructor(
 
     /*
     ====================================
+    TIMER JOB
+    ====================================
+    */
+
+    private var timerJob: Job? = null
+
+    /*
+    ====================================
     INIT
     ====================================
     */
@@ -67,104 +77,50 @@ class FocusViewModel @Inject constructor(
             getAllTasksUseCase()
                 .collect { taskList ->
 
-                    /*
-                    ================================
-                    UPDATE OVERDUE TASKS
-                    ================================
-                    */
-
                     checkOverdueTasks(taskList)
-
-                    /*
-                    ================================
-                    UPDATE UI TASKS
-                    ================================
-                    */
 
                     val updatedTasks =
 
                         taskList.map { task ->
 
-                            /*
-                            ========================
-                            COMPLETED
-                            ========================
-                            */
+                            when {
 
-                            if (
-                                task.status == "Completed"
-                            ) {
+                                task.status ==
+                                        "Completed" -> {
 
-                                task
-                            }
+                                    task
+                                }
 
-                            /*
-                            ========================
-                            IN PROGRESS
-                            tetap in progress
-                            ========================
-                            */
+                                task.status ==
+                                        "In Progress" -> {
 
-                            else if (
-                                task.status == "In Progress"
-                            ) {
-
-                                task
-                            }
-
-                            /*
-                            ========================
-                            OVERDUE
-                            ========================
-                            */
-
-                            else if (
+                                    task
+                                }
 
                                 TimeUtils.isTaskOverdue(
                                     task.deadline
-                                )
+                                ) -> {
 
-                            ) {
+                                    task.copy(
+                                        status = "Overdue"
+                                    )
+                                }
 
-                                task.copy(
-                                    status = "Overdue"
-                                )
-                            }
-
-                            /*
-                            ========================
-                            NORMAL TASK
-                            ========================
-                            */
-
-                            else {
-
-                                /*
-                                reset overdue
-                                jika deadline berubah
-                                */
-
-                                if (
-                                    task.status == "Overdue"
-                                ) {
+                                task.status ==
+                                        "Overdue" -> {
 
                                     task.copy(
                                         status =
                                             "Not Started"
                                     )
+                                }
 
-                                } else {
+                                else -> {
 
                                     task
                                 }
                             }
                         }
-
-                    /*
-                    ================================
-                    FILTER COMPLETED TASKS
-                    ================================
-                    */
 
                     val availableTasks =
 
@@ -173,25 +129,11 @@ class FocusViewModel @Inject constructor(
                             task.status != "Completed"
                         }
 
-                    /*
-                    ================================
-                    SORT TASKS
-                    overdue first
-                    nearest deadline
-                    ================================
-                    */
-
                     val sortedTasks =
 
                         TaskUtils.sortTasksByPriority(
                             availableTasks
                         )
-
-                    /*
-                    ================================
-                    UPDATE UI STATE
-                    ================================
-                    */
 
                     _uiState.update { currentState ->
 
@@ -218,24 +160,12 @@ class FocusViewModel @Inject constructor(
 
         tasks.forEach { task ->
 
-            /*
-            ================================
-            SKIP COMPLETED
-            ================================
-            */
-
             if (
                 task.status == "Completed"
             ) {
 
                 return@forEach
             }
-
-            /*
-            ================================
-            SKIP IN PROGRESS
-            ================================
-            */
 
             if (
                 task.status == "In Progress"
@@ -244,24 +174,12 @@ class FocusViewModel @Inject constructor(
                 return@forEach
             }
 
-            /*
-            ================================
-            ALREADY OVERDUE
-            ================================
-            */
-
             if (
                 task.status == "Overdue"
             ) {
 
                 return@forEach
             }
-
-            /*
-            ================================
-            CHECK OVERDUE
-            ================================
-            */
 
             if (
 
@@ -352,6 +270,16 @@ class FocusViewModel @Inject constructor(
         minutes: Int
     ) {
 
+        val durationInSeconds =
+
+            if (minutes == 10)
+
+                10
+
+            else
+
+                minutes * 60
+
         _uiState.update { currentState ->
 
             currentState.copy(
@@ -359,12 +287,288 @@ class FocusViewModel @Inject constructor(
                 selectedDuration = minutes,
 
                 remainingSeconds =
-                    minutes * 60,
+                    durationInSeconds,
 
                 totalSeconds =
-                    minutes * 60,
+                    durationInSeconds,
 
                 progress = 1f
+            )
+        }
+    }
+
+    /*
+    ====================================
+    START SESSION
+    ====================================
+    */
+
+    fun startFocusSession() {
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+
+                isRunning = true,
+
+                isPaused = false,
+
+                isCompleted = false
+            )
+        }
+
+        _uiState.value.selectedTask?.let { task ->
+
+            startTaskFocus(task)
+        }
+
+        startTimer()
+    }
+
+    /*
+    ====================================
+    START TIMER
+    ====================================
+    */
+
+    fun startTimer() {
+
+        timerJob?.cancel()
+
+        timerJob =
+
+            viewModelScope.launch {
+
+                while (
+
+                    _uiState.value.remainingSeconds > 0 &&
+
+                    _uiState.value.isRunning
+                ) {
+
+                    delay(1000)
+
+                    val currentSeconds =
+
+                        _uiState.value.remainingSeconds - 1
+
+                    val totalSeconds =
+
+                        _uiState.value.totalSeconds
+
+                    val updatedProgress =
+
+                        currentSeconds
+                            .toFloat() /
+
+                                totalSeconds
+                                    .toFloat()
+
+                    _uiState.update { currentState ->
+
+                        currentState.copy(
+
+                            remainingSeconds =
+                                currentSeconds,
+
+                            progress =
+                                updatedProgress
+                        )
+                    }
+                }
+
+                /*
+                ====================================
+                SESSION COMPLETE
+                ====================================
+                */
+
+                if (
+                    _uiState.value.remainingSeconds <= 0
+                ) {
+
+                    completeSession()
+                }
+            }
+    }
+
+    /*
+    ====================================
+    PAUSE TIMER
+    ====================================
+    */
+
+    fun pauseTimer() {
+
+        timerJob?.cancel()
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+
+                isRunning = false,
+
+                isPaused = true
+            )
+        }
+    }
+
+    /*
+    ====================================
+    RESUME TIMER
+    ====================================
+    */
+
+    fun resumeTimer() {
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+
+                isRunning = true,
+
+                isPaused = false
+            )
+        }
+
+        startTimer()
+    }
+
+    /*
+    ====================================
+    STOP TIMER
+    ====================================
+    */
+
+    fun stopTimer() {
+
+        timerJob?.cancel()
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+
+                isRunning = false,
+
+                isPaused = false
+            )
+        }
+    }
+
+    /*
+    ====================================
+    ADD EXTRA TIME
+    ====================================
+    */
+
+    fun addExtraTime() {
+
+        val extraTime =
+
+            if (
+                _uiState.value.selectedDuration == 10
+            )
+
+                10
+
+            else
+
+                600
+
+        _uiState.update { currentState ->
+
+            val updatedTotal =
+
+                currentState.totalSeconds +
+                        extraTime
+
+            val updatedRemaining =
+
+                currentState.remainingSeconds +
+                        extraTime
+
+            currentState.copy(
+
+                remainingSeconds =
+                    updatedRemaining,
+
+                totalSeconds =
+                    updatedTotal,
+
+                progress =
+
+                    updatedRemaining
+                        .toFloat() /
+
+                            updatedTotal
+                                .toFloat(),
+
+                showExtendDialog = false,
+
+                isRunning = true,
+
+                isPaused = false,
+
+                isCompleted = false
+            )
+        }
+
+        startTimer()
+    }
+
+    /*
+    ====================================
+    SHOW EXTEND DIALOG
+    ====================================
+    */
+
+    fun showExtendDialog() {
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+
+                showExtendDialog = true
+            )
+        }
+    }
+
+    /*
+    ====================================
+    HIDE EXTEND DIALOG
+    ====================================
+    */
+
+    fun hideExtendDialog() {
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+
+                showExtendDialog = false
+            )
+        }
+    }
+
+    /*
+    ====================================
+    COMPLETE SESSION
+    ====================================
+    */
+
+    private fun completeSession() {
+
+        timerJob?.cancel()
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+
+                isRunning = false,
+
+                isPaused = false,
+
+                isCompleted = true
             )
         }
     }
@@ -397,6 +601,8 @@ class FocusViewModel @Inject constructor(
 
     fun resetSession() {
 
+        timerJob?.cancel()
+
         _uiState.update { currentState ->
 
             currentState.copy(
@@ -411,13 +617,15 @@ class FocusViewModel @Inject constructor(
 
                 isCompleted = false,
 
-                selectedDuration = 25,
+                selectedDuration = null,
 
-                remainingSeconds = 25 * 60,
+                remainingSeconds = 0,
 
-                totalSeconds = 25 * 60,
+                totalSeconds = 0,
 
-                progress = 1f
+                progress = 1f,
+
+                showExtendDialog = false
             )
         }
     }

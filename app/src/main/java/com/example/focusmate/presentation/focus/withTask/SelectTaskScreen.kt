@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.focus.selecttask
+package com.example.focusmate.presentation.focus.withTask
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -45,8 +45,7 @@ fun SelectTaskScreen(
 
     navController: NavController,
 
-    viewModel: FocusViewModel =
-        hiltViewModel()
+    viewModel: FocusViewModel
 ) {
 
     /*
@@ -232,9 +231,12 @@ fun SelectTaskScreen(
 
                 onClick = {
 
-                    navController.navigate(
-                        Screen.StartFocus.route
-                    )
+                    uiState.selectedTask?.let {
+
+                        navController.navigate(
+                            Screen.StartFocus.route
+                        )
+                    }
                 },
 
                 enabled =

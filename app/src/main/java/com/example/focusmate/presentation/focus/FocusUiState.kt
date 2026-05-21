@@ -27,11 +27,17 @@ data class FocusUiState(
     ====================================
     */
 
-    val selectedDuration: Int = 25,
+    val selectedDuration: Int? = null,
 
-    val remainingSeconds: Int = 25 * 60,
+    val remainingSeconds: Int = 0,
 
-    val totalSeconds: Int = 25 * 60,
+    val totalSeconds: Int = 0,
+
+    /*
+    ====================================
+    TIMER PROGRESS
+    ====================================
+    */
 
     val progress: Float = 1f,
 
@@ -46,6 +52,14 @@ data class FocusUiState(
     val isPaused: Boolean = false,
 
     val isCompleted: Boolean = false,
+
+    /*
+    ====================================
+    EXTEND FOCUS DIALOG
+    ====================================
+    */
+
+    val showExtendDialog: Boolean = false,
 
     /*
     ====================================
@@ -86,7 +100,7 @@ data class FocusUiState(
 
     /*
     ====================================
-    FILTER
+    HISTORY FILTER
     ====================================
     */
 

@@ -1,80 +1,74 @@
-package com.example.focusmate.presentation.components.startfocus
+package com.example.focusmate.presentation.components.StartFocus
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.Text
+import com.example.focusmate.presentation.theme.TextPrimary
+import com.example.focusmate.presentation.theme.TextSecondary
 
 @Composable
 fun FocusTimer(
 
-    taskTitle: String,
-
-    sessionLabel: String,
-
-    modifier: Modifier = Modifier
+    remainingSeconds: Int
 ) {
 
     /*
     ====================================
-    CONTAINER
+    TIME FORMAT
+    ====================================
+    */
+
+    val minutes =
+
+        remainingSeconds / 60
+
+    val seconds =
+
+        remainingSeconds % 60
+
+    val formattedTime =
+
+        String.format(
+            "%02d:%02d",
+            minutes,
+            seconds
+        )
+
+    /*
+    ====================================
+    TIMER
     ====================================
     */
 
     Column(
 
-        modifier = modifier,
-
         horizontalAlignment =
             Alignment.CenterHorizontally
     ) {
 
-        /*
-        ====================================
-        TASK TITLE
-        ====================================
-        */
+        Text(
+
+            text = formattedTime,
+
+            color = TextPrimary,
+
+            fontSize = 64.sp,
+
+            fontWeight =
+                FontWeight.Light
+        )
 
         Text(
 
-            text = taskTitle,
+            text =
+                "Focus in progress...",
 
-            color = Color.White,
+            color = TextSecondary,
 
-            fontSize = 24.sp,
-
-            fontWeight =
-                FontWeight.Bold
-        )
-
-        Spacer(
-            modifier = Modifier.height(8.dp)
-        )
-
-        /*
-        ====================================
-        SESSION LABEL
-        ====================================
-        */
-
-        Text(
-
-            text = sessionLabel,
-
-            color =
-                Color(0xFFB1C4FF),
-
-            fontSize = 15.sp,
-
-            fontWeight =
-                FontWeight.Medium
+            fontSize = 16.sp
         )
     }
 }

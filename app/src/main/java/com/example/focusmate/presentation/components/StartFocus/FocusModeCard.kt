@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.components
+package com.example.focusmate.presentation.components.StartFocus
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

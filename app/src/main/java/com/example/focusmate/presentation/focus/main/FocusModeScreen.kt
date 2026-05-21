@@ -1,4 +1,4 @@
-package com.example.focusmate.presentation.focus.mode
+package com.example.focusmate.presentation.focus.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,7 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.focusmate.R
 import com.example.focusmate.presentation.components.BottomNavbar
-import com.example.focusmate.presentation.components.FocusModeCard
+import com.example.focusmate.presentation.components.StartFocus.FocusModeCard
 import com.example.focusmate.presentation.focus.FocusViewModel
 import com.example.focusmate.presentation.navigation.Screen
 import com.example.focusmate.presentation.theme.BackgroundDark
