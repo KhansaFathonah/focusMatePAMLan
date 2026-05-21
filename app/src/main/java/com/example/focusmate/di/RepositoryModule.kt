@@ -1,9 +1,11 @@
 package com.example.focusmate.di
 
+import com.example.focusmate.data.repository.BackupRepositoryImpl
 import com.example.focusmate.data.repository.FocusRepositoryImpl
 import com.example.focusmate.data.repository.MotivationRepositoryImpl
 import com.example.focusmate.data.repository.SettingsRepositoryImpl
 import com.example.focusmate.data.repository.TaskRepositoryImpl
+import com.example.focusmate.domain.repository.BackupRepository
 import com.example.focusmate.domain.repository.FocusRepository
 import com.example.focusmate.domain.repository.MotivationRepository
 import com.example.focusmate.domain.repository.SettingsRepository
@@ -73,4 +75,18 @@ abstract class RepositoryModule {
         repositoryImpl: SettingsRepositoryImpl
 
     ): SettingsRepository
+
+    /*
+    ========================================
+    BACKUP REPOSITORY
+    ========================================
+    */
+
+    @Binds
+    @Singleton
+    abstract fun bindBackupRepository(
+
+        repositoryImpl: BackupRepositoryImpl
+
+    ): BackupRepository
 }

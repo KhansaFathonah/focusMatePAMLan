@@ -18,12 +18,26 @@ interface TaskDao {
     fun getAllTasks():
             Flow<List<TaskEntity>>
 
+    @Query(
+        "SELECT * FROM tasks ORDER BY id DESC"
+    )
+    suspend fun getAllTasksSnapshot():
+            List<TaskEntity>
+
     @Insert(
         onConflict =
             OnConflictStrategy.REPLACE
     )
     suspend fun insertTask(
         task: TaskEntity
+    )
+
+    @Insert(
+        onConflict =
+            OnConflictStrategy.REPLACE
+    )
+    suspend fun insertTasks(
+        tasks: List<TaskEntity>
     )
 
     @Update
@@ -35,4 +49,9 @@ interface TaskDao {
     suspend fun deleteTask(
         task: TaskEntity
     )
+
+    @Query(
+        "DELETE FROM tasks"
+    )
+    suspend fun clearTasks()
 }

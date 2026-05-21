@@ -1,7 +1,10 @@
 package com.example.focusmate.presentation.settingsPage.backup
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +29,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,13 +64,35 @@ fun BackupScreen(
 
     /*
     ====================================
-    BUTTON ENABLE STATE
+    FILE PICKERS
     ====================================
     */
 
-    val isBackupEnabled =
+    val backupDirectoryLauncher =
+        rememberLauncherForActivityResult(
+            contract =
+                ActivityResultContracts.OpenDocumentTree()
+        ) { directoryUri ->
 
-        uiState.autoBackup
+            directoryUri?.let {
+                viewModel.backupToDirectory(
+                    it
+                )
+            }
+        }
+
+    val restoreFileLauncher =
+        rememberLauncherForActivityResult(
+            contract =
+                ActivityResultContracts.OpenDocument()
+        ) { fileUri ->
+
+            fileUri?.let {
+                viewModel.restoreFromFile(
+                    it
+                )
+            }
+        }
 
     /*
     ====================================
@@ -115,6 +141,9 @@ fun BackupScreen(
                         vertical = 16.dp
                     )
                     .navigationBarsPadding()
+                    .verticalScroll(
+                        rememberScrollState()
+                    )
             ) {
 
                 /*
@@ -238,14 +267,13 @@ fun BackupScreen(
 
                     onClick = {
 
-                        /*
-                        TODO:
-                        START BACKUP
-                        */
+                        backupDirectoryLauncher.launch(
+                            null
+                        )
                     },
 
                     enabled =
-                        isBackupEnabled,
+                        !uiState.isProcessing,
 
                     modifier = Modifier
                         .align(
@@ -262,7 +290,7 @@ fun BackupScreen(
 
                             containerColor =
 
-                                if (isBackupEnabled)
+                                if (!uiState.isProcessing)
 
                                     ButtonPrimary
 
@@ -281,11 +309,15 @@ fun BackupScreen(
 
                     Text(
 
-                        text = "Backup Now",
+                        text =
+                            if (uiState.isProcessing)
+                                "Working..."
+                            else
+                                "Backup Now",
 
                         color =
 
-                            if (isBackupEnabled)
+                            if (!uiState.isProcessing)
 
                                 TextDark
 
@@ -299,6 +331,87 @@ fun BackupScreen(
 
                         fontWeight =
                             FontWeight.Bold
+                    )
+                }
+
+                Spacer(
+                    modifier = Modifier.height(14.dp)
+                )
+
+                /*
+                ====================================
+                RESTORE BUTTON
+                ====================================
+                */
+
+                OutlinedButton(
+
+                    onClick = {
+
+                        restoreFileLauncher.launch(
+                            arrayOf(
+                                "application/json",
+                                "text/json",
+                                "text/plain"
+                            )
+                        )
+                    },
+
+                    enabled =
+                        !uiState.isProcessing,
+
+                    modifier = Modifier
+                        .align(
+                            Alignment.CenterHorizontally
+                        )
+                        .fillMaxWidth(0.55f)
+                        .height(58.dp),
+
+                    shape =
+                        RoundedCornerShape(30.dp),
+
+                    colors =
+                        ButtonDefaults.outlinedButtonColors(
+                            contentColor = ButtonPrimary,
+                            disabledContentColor =
+                                ButtonPrimary.copy(
+                                    alpha = 0.42f
+                                )
+                        )
+                ) {
+
+                    Text(
+
+                        text = "Restore Now",
+
+                        fontSize = 17.sp,
+
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+                }
+
+                uiState.statusMessage?.let { message ->
+
+                    Spacer(
+                        modifier = Modifier.height(18.dp)
+                    )
+
+                    Text(
+
+                        text = message,
+
+                        color = TextPrimary,
+
+                        fontSize = 14.sp,
+
+                        textAlign = TextAlign.Center,
+
+                        modifier = Modifier
+                            .align(
+                                Alignment.CenterHorizontally
+                            )
+                            .fillMaxWidth()
                     )
                 }
 

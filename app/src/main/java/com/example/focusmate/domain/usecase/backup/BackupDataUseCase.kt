@@ -1,5 +1,6 @@
 package com.example.focusmate.domain.usecase.backup
 
+import android.net.Uri
 import com.example.focusmate.domain.repository.BackupRepository
 import javax.inject.Inject
 
@@ -9,8 +10,12 @@ class BackupDataUseCase @Inject constructor(
 
 ) {
 
-    suspend operator fun invoke() {
+    suspend operator fun invoke(
+        directoryUri: Uri
+    ): String {
 
-        repository.backupData()
+        return repository.backupData(
+            directoryUri
+        )
     }
 }
