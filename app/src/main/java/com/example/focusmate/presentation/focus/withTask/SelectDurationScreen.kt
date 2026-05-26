@@ -352,7 +352,7 @@ fun SelectDurationScreen(
 
             modifier = Modifier
                 .fillMaxWidth()
-                .height(62.dp),
+                .height(50.dp),
 
             shape =
                 RoundedCornerShape(22.dp),
@@ -393,7 +393,7 @@ fun SelectDurationScreen(
 
                         TextSecondary,
 
-                fontSize = 18.sp,
+                fontSize = 14.sp,
 
                 fontWeight =
                     FontWeight.ExtraBold

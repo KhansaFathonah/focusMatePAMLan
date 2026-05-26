@@ -37,266 +37,126 @@ fun SelectDuration(
     onDurationSelected:
         (Int) -> Unit
 ) {
-
-    /*
-    ====================================
-    NORMAL DURATIONS
-    ====================================
-    */
-
-    val normalDurations = listOf(
+    val durations = listOf(
 
         15,
         25,
         45
     )
 
-    /*
-    ====================================
-    MAIN COLUMN
-    ====================================
-    */
-
-    Column(
+    Row(
 
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+
+        horizontalArrangement =
+            Arrangement.SpaceBetween
     ) {
 
-        /*
-        ====================================
-        DEMO DURATION
-        ====================================
-        */
+        durations.forEach { duration ->
 
-        DurationCard(
+            DurationCard(
 
-            duration = 10,
+                duration = duration,
 
-            label = "seconds",
+                label = "minutes",
 
-            isSelected =
-                selectedDuration == 10,
+                isSelected =
+                    selectedDuration ==
+                            duration,
 
-            modifier = Modifier
-                .fillMaxWidth(),
+                modifier = Modifier
+                    .width(90.dp),
 
-            onClick = {
+                onClick = {
 
-                onDurationSelected(10)
-            }
-        )
-
-        /*
-        ====================================
-        SPACE
-        ====================================
-        */
-
-        Spacer(
-            modifier = Modifier.height(18.dp)
-        )
-
-        /*
-        ====================================
-        NORMAL ROW
-        ====================================
-        */
-
-        Row(
-
-            modifier = Modifier
-                .fillMaxWidth(),
-
-            horizontalArrangement =
-                Arrangement.SpaceBetween
-        ) {
-
-            normalDurations.forEach { duration ->
-
-                DurationCard(
-
-                    duration = duration,
-
-                    label = "minutes",
-
-                    isSelected =
-                        selectedDuration ==
-                                duration,
-
-                    modifier = Modifier
-                        .width(102.dp),
-
-                    onClick = {
-
-                        onDurationSelected(
-                            duration
-                        )
-                    }
-                )
-            }
+                    onDurationSelected(
+                        duration
+                    )
+                }
+            )
         }
     }
 }
-
-/*
-========================================
-DURATION CARD
-========================================
-*/
 
 @Composable
 private fun DurationCard(
 
     duration: Int,
-
     label: String,
-
     isSelected: Boolean,
-
     modifier: Modifier = Modifier,
-
     onClick: () -> Unit
 ) {
 
-    /*
-    ====================================
-    ANIMATION
-    ====================================
-    */
-
     val backgroundColor by
     animateColorAsState(
-
         targetValue =
-
             if (isSelected)
-
                 ButtonPrimary
-
             else
-
                 ButtonDark,
-
         animationSpec =
             tween(300),
-
         label = "duration_color"
     )
-
     val scale by
     animateFloatAsState(
-
         targetValue =
-
             if (isSelected)
-
                 1.03f
-
             else
-
                 1f,
-
         animationSpec =
             tween(300),
-
         label = "duration_scale"
     )
 
-    /*
-    ====================================
-    CARD
-    ====================================
-    */
-
     Box(
-
         modifier = modifier
-            .height(102.dp)
+            .height(80.dp)
             .scale(scale)
             .background(
-
                 color =
                     backgroundColor,
-
                 shape =
-                    RoundedCornerShape(24.dp)
+                    RoundedCornerShape(18.dp)
             )
             .clickable {
-
                 onClick()
             }
             .padding(horizontal = 10.dp),
-
         contentAlignment =
             Alignment.Center
     ) {
-
         Column(
-
             horizontalAlignment =
                 Alignment.CenterHorizontally
         ) {
 
-            /*
-            ====================================
-            DURATION TEXT
-            ====================================
-            */
-
             Text(
-
                 text =
                     duration.toString(),
-
                 color =
-
                     if (isSelected)
-
                         TextDark
-
                     else
-
                         TextSecondary,
-
-                fontSize = 34.sp,
-
+                fontSize = 25.sp,
                 fontWeight =
                     FontWeight.ExtraBold
             )
-
-            /*
-            ====================================
-            SPACE
-            ====================================
-            */
-
             Spacer(
                 modifier = Modifier.height(2.dp)
             )
-
-            /*
-            ====================================
-            LABEL
-            ====================================
-            */
-
             Text(
-
                 text = label,
-
                 color =
-
                     if (isSelected)
-
                         TextDark
-
                     else
-
                         TextSecondary,
-
                 fontSize = 14.sp,
-
                 fontWeight =
                     FontWeight.Medium
             )

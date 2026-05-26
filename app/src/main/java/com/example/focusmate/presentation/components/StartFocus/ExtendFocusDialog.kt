@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.focusmate.presentation.theme.ButtonDark
@@ -70,7 +71,7 @@ fun ExtendFocusDialog(
                     color = CardDark,
 
                     shape =
-                        RoundedCornerShape(28.dp)
+                        RoundedCornerShape(30.dp)
                 )
                 .padding(
 
@@ -133,25 +134,28 @@ fun ExtendFocusDialog(
             */
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier = Modifier.height(10.dp)
             )
 
             /*
             ====================================
-            SUBTITLE
+            DESCRIPTION
             ====================================
             */
 
             Text(
 
                 text =
-                    "Would you like to add more focus time?",
+                    "You're doing great. Would you like to extend your focus session for another 10 minutes?",
 
                 color = TextSecondary,
 
                 fontSize = 15.sp,
 
-                lineHeight = 22.sp
+                lineHeight = 23.sp,
+
+                textAlign =
+                    TextAlign.Center
             )
 
             /*
@@ -161,7 +165,7 @@ fun ExtendFocusDialog(
             */
 
             Spacer(
-                modifier = Modifier.height(28.dp)
+                modifier = Modifier.height(30.dp)
             )
 
             /*
@@ -218,7 +222,7 @@ fun ExtendFocusDialog(
 
             /*
             ====================================
-            FINISH TASK BUTTON
+            FINISH BUTTON
             ====================================
             */
 
