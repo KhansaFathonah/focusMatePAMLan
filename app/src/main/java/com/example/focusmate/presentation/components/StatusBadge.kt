@@ -10,58 +10,56 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun StatusBadge(
-
     status: String,
-
     modifier: Modifier = Modifier
 ) {
 
-    /*
-    ====================================
-    STATUS COLOR
-    ====================================
-    */
+    val normalizedStatus =
+        status.trim()
 
-    val backgroundColor = when (status) {
+    val backgroundColor =
+        when (normalizedStatus) {
 
-        "In Progress" ->
-            Color(0xFF091633)
+            "Completed" ->
+                Color(0xFF2E7D32)
 
-        "Completed" ->
-            Color(0xFF2E7D32)
+            "Overdue" ->
+                Color(0xFFE05656)
 
-        "Overdue" ->
-            Color(0xFFE05656)
+            "Paused" ->
+                Color(0xFFFFC857)
 
-        else ->
-            Color(0xFF7B8194)
-    }
+            "Not Started" ->
+                Color(0xFF7B8194)
 
-    /*
-    ====================================
-    BADGE
-    ====================================
-    */
+            else ->
+                Color(0xFF7B8194)
+        }
+
+    val textColor =
+        when (normalizedStatus) {
+
+            "Paused" ->
+                Color(0xFF1B2336)
+
+            else ->
+                Color.White
+        }
 
     Row(
-
         modifier = modifier
             .background(
-
                 color = backgroundColor,
-
-                shape =
-                    RoundedCornerShape(50.dp)
+                shape = RoundedCornerShape(50.dp)
             )
             .padding(
-
                 horizontal = 14.dp,
-
                 vertical = 7.dp
             ),
 
@@ -70,15 +68,19 @@ fun StatusBadge(
     ) {
 
         Text(
+            text = normalizedStatus,
 
-            text = status,
-
-            color = Color.White,
+            color = textColor,
 
             fontSize = 12.sp,
 
             fontWeight =
-                FontWeight.Medium
+                FontWeight.Medium,
+
+            maxLines = 1,
+
+            overflow =
+                TextOverflow.Ellipsis
         )
     }
 }

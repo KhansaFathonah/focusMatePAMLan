@@ -6,7 +6,6 @@ import com.example.focusmate.domain.model.Task
 fun TaskEntity.toDomain(): Task {
 
     return Task(
-
         id = id,
 
         title = title,
@@ -15,7 +14,9 @@ fun TaskEntity.toDomain(): Task {
 
         status = status,
 
-        focusMinutes = focusMinutes
+        focusMinutes = focusMinutes,
+
+        focusSessions = focusSessions
     )
 }
 
@@ -31,6 +32,8 @@ fun Task.toEntity(): TaskEntity {
 
         status = status,
 
-        focusMinutes = focusMinutes
+        focusMinutes = focusMinutes,
+
+        focusSessions = focusSessions
     )
 }

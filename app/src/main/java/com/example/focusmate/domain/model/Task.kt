@@ -10,5 +10,7 @@ data class Task(
 
     val status: String = "Not Started",
 
-    val focusMinutes: Int = 0
+    val focusMinutes: Int = 0,
+
+    val focusSessions: Int = 0
 )

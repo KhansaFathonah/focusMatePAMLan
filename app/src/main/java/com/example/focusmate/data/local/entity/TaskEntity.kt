@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey
 data class TaskEntity(
 
     @PrimaryKey(autoGenerate = true)
+
     val id: Int = 0,
 
     val title: String,
@@ -17,5 +18,7 @@ data class TaskEntity(
 
     val status: String,
 
-    val focusMinutes: Int
+    val focusMinutes: Int = 0,
+
+    val focusSessions: Int = 0
 )

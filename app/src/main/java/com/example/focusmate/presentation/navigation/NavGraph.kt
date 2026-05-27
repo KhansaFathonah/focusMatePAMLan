@@ -4,55 +4,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
-/*
-========================================
-SPLASH
-========================================
-*/
-
+import androidx.navigation.navArgument
 import com.example.focusmate.presentation.splash.SplashScreen
-
-/*
-========================================
-HOME
-========================================
-*/
-
 import com.example.focusmate.presentation.homePage.addtask.AddTaskScreen
 import com.example.focusmate.presentation.homePage.home.HomeScreen
-
-/*
-========================================
-FOCUS
-========================================
-*/
-
 import com.example.focusmate.presentation.focus.FocusViewModel
 import com.example.focusmate.presentation.focus.complete.SessionCompleteScreen
 import com.example.focusmate.presentation.focus.main.FocusModeScreen
+import com.example.focusmate.presentation.focus.quick.QuickFocusCompleteScreen
+import com.example.focusmate.presentation.focus.quick.QuickFocusDurationScreen
+import com.example.focusmate.presentation.focus.quick.QuickFocusSessionScreen
 import com.example.focusmate.presentation.focus.withTask.ActiveSessionScreen
 import com.example.focusmate.presentation.focus.withTask.SelectDurationScreen
 import com.example.focusmate.presentation.focus.withTask.SelectTaskScreen
-
-/*
-========================================
-PROGRESS
-========================================
-*/
-
 import com.example.focusmate.presentation.progressPage.history.HistoryScreen
 import com.example.focusmate.presentation.progressPage.progress.ProgressScreen
-
-/*
-========================================
-SETTINGS
-========================================
-*/
-
 import com.example.focusmate.presentation.settingsPage.about.AboutScreen
 import com.example.focusmate.presentation.settingsPage.backup.BackupScreen
 import com.example.focusmate.presentation.settingsPage.main.MainSettingsScreen
@@ -66,12 +36,6 @@ fun NavGraph(
 
 ) {
 
-    /*
-    ========================================
-    NAV HOST
-    ========================================
-    */
-
     NavHost(
 
         navController = navController,
@@ -79,12 +43,6 @@ fun NavGraph(
         startDestination =
             Screen.Splash.route
     ) {
-
-        /*
-        ========================================
-        SPLASH
-        ========================================
-        */
 
         composable(
             route = Screen.Splash.route
@@ -95,12 +53,6 @@ fun NavGraph(
             )
         }
 
-        /*
-        ========================================
-        HOME
-        ========================================
-        */
-
         composable(
             route = Screen.Home.route
         ) {
@@ -109,12 +61,6 @@ fun NavGraph(
                 navController = navController
             )
         }
-
-        /*
-        ========================================
-        ADD TASK
-        ========================================
-        */
 
         composable(
             route = Screen.AddTask.route
@@ -125,12 +71,6 @@ fun NavGraph(
             )
         }
 
-        /*
-        ========================================
-        FOCUS MODE
-        ========================================
-        */
-
         composable(
             route = Screen.Focus.route
         ) {
@@ -140,11 +80,86 @@ fun NavGraph(
             )
         }
 
-        /*
-        ========================================
-        SELECT TASK
-        ========================================
-        */
+        composable(
+            route =
+                Screen.QuickFocusDuration.route
+        ) {
+
+            QuickFocusDurationScreen(
+                navController = navController
+            )
+        }
+
+        composable(
+
+            route =
+                "${Screen.QuickFocusSession.route}/{duration}",
+
+            arguments = listOf(
+
+                navArgument("duration") {
+
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
+
+            val duration =
+
+                backStackEntry.arguments
+                    ?.getInt("duration")
+                    ?: 25
+
+            val parentEntry = remember(backStackEntry) {
+
+                navController.getBackStackEntry(
+                    Screen.Focus.route
+                )
+            }
+
+            val focusViewModel:
+                    FocusViewModel =
+
+                hiltViewModel(parentEntry)
+
+            QuickFocusSessionScreen(
+
+                navController = navController,
+
+                duration = duration,
+
+                viewModel = focusViewModel
+            )
+        }
+
+        composable(
+
+            route =
+                "${Screen.QuickFocusComplete.route}/{duration}",
+
+            arguments = listOf(
+
+                navArgument("duration") {
+
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
+
+            val duration =
+
+                backStackEntry.arguments
+                    ?.getInt("duration")
+                    ?: 25
+
+            QuickFocusCompleteScreen(
+
+                navController = navController,
+
+                duration = duration
+            )
+        }
+
 
         composable(
             route = Screen.SelectTask.route
@@ -170,12 +185,6 @@ fun NavGraph(
             )
         }
 
-        /*
-        ========================================
-        SELECT DURATION
-        ========================================
-        */
-
         composable(
             route = Screen.StartFocus.route
         ) { backStackEntry ->
@@ -199,12 +208,6 @@ fun NavGraph(
                 viewModel = focusViewModel
             )
         }
-
-        /*
-        ========================================
-        ACTIVE SESSION
-        ========================================
-        */
 
         composable(
             route = Screen.ActiveSession.route
@@ -230,12 +233,6 @@ fun NavGraph(
             )
         }
 
-        /*
-        ========================================
-        SESSION COMPLETE
-        ========================================
-        */
-
         composable(
             route = Screen.SessionComplete.route
         ) { backStackEntry ->
@@ -260,12 +257,6 @@ fun NavGraph(
             )
         }
 
-        /*
-        ========================================
-        PROGRESS
-        ========================================
-        */
-
         composable(
             route = Screen.Progress.route
         ) {
@@ -274,12 +265,6 @@ fun NavGraph(
                 navController = navController
             )
         }
-
-        /*
-        ========================================
-        HISTORY
-        ========================================
-        */
 
         composable(
             route = Screen.History.route
@@ -290,12 +275,6 @@ fun NavGraph(
             )
         }
 
-        /*
-        ========================================
-        SETTINGS
-        ========================================
-        */
-
         composable(
             route = Screen.Settings.route
         ) {
@@ -304,12 +283,6 @@ fun NavGraph(
                 navController = navController
             )
         }
-
-        /*
-        ========================================
-        NOTIFICATION
-        ========================================
-        */
 
         composable(
             route = Screen.Notification.route
@@ -320,12 +293,6 @@ fun NavGraph(
             )
         }
 
-        /*
-        ========================================
-        BACKUP
-        ========================================
-        */
-
         composable(
             route = Screen.Backup.route
         ) {
@@ -334,12 +301,6 @@ fun NavGraph(
                 navController = navController
             )
         }
-
-        /*
-        ========================================
-        ABOUT
-        ========================================
-        */
 
         composable(
             route = Screen.About.route

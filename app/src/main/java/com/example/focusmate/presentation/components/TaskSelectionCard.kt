@@ -1,5 +1,6 @@
 package com.example.focusmate.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,150 +24,93 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.focusmate.domain.model.Task
 
 @Composable
 fun TaskSelectionCard(
-
     task: Task,
-
     isSelected: Boolean,
-
     onClick: () -> Unit,
-
     modifier: Modifier = Modifier
 ) {
 
-    /*
-    ====================================
-    STATUS COLOR
-    ====================================
-    */
+    val normalizedStatus =
+        task.status.trim()
 
-    val statusColor = when (task.status) {
-
-        "In Progress" ->
-            Color(0xFF091633)
-
-        "Completed" ->
-            Color(0xFF2E7D32)
-
-        else ->
-            Color(0xFF616161)
-    }
-
-    /*
-    ====================================
-    CONTAINER
-    ====================================
-    */
+    val shadowColor =
+        if (isSelected) {
+            Color(0xFFB1C4FF).copy(alpha = 0.9f)
+        } else {
+            Color.Transparent
+        }
 
     Box(
-
         modifier = modifier
             .fillMaxWidth()
     ) {
 
-        /*
-        ====================================
-        BLUE SHADOW
-        RIGHT + BOTTOM ONLY
-        ====================================
-        */
-
         if (isSelected) {
 
             Box(
-
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-
                         start = 10.dp,
-                        top = 8.dp,
-                        end = 0.dp,
-                        bottom = 0.dp
+                        top = 8.dp
                     )
                     .height(118.dp)
                     .background(
-
-                        color =
-                            Color(0xFFB1C4FF)
-                                .copy(alpha = 0.9f),
-
-                        shape =
-                            RoundedCornerShape(30.dp)
+                        color = shadowColor,
+                        shape = RoundedCornerShape(30.dp)
                     )
             )
         }
 
-        /*
-        ====================================
-        MAIN CARD
-        ====================================
-        */
-
         Card(
-
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(30.dp))
                 .clickable {
-
                     onClick()
                 },
 
             shape = RoundedCornerShape(30.dp),
 
             border =
+                if (isSelected) {
 
-                if (isSelected)
-
-                    androidx.compose.foundation.BorderStroke(
-
+                    BorderStroke(
                         width = 1.5.dp,
-
-                        color =
-                            Color(0xFFB1C4FF)
+                        color = Color(0xFFB1C4FF)
                     )
 
-                else null,
+                } else {
+
+                    null
+                },
 
             colors = CardDefaults.cardColors(
-
                 containerColor =
                     Color(0xFFDCDCDC)
             )
         ) {
 
-            /*
-            ====================================
-            CONTENT
-            ====================================
-            */
-
             Column(
-
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-
                         horizontal = 20.dp,
                         vertical = 18.dp
                     )
             ) {
 
-                /*
-                ====================================
-                TOP SECTION
-                ====================================
-                */
-
                 Row(
-
                     modifier = Modifier
                         .fillMaxWidth(),
 
@@ -177,26 +121,12 @@ fun TaskSelectionCard(
                         Alignment.Top
                 ) {
 
-                    /*
-                    ====================================
-                    TEXT SECTION
-                    ====================================
-                    */
-
                     Column(
-
                         modifier = Modifier
                             .weight(1f)
                     ) {
 
-                        /*
-                        ====================================
-                        TASK TITLE
-                        ====================================
-                        */
-
                         Text(
-
                             text = task.title,
 
                             color =
@@ -205,21 +135,19 @@ fun TaskSelectionCard(
                             fontSize = 18.sp,
 
                             fontWeight =
-                                FontWeight.Bold
+                                FontWeight.Bold,
+
+                            maxLines = 1,
+
+                            overflow =
+                                TextOverflow.Ellipsis
                         )
 
                         Spacer(
                             modifier = Modifier.height(4.dp)
                         )
 
-                        /*
-                        ====================================
-                        DEADLINE
-                        ====================================
-                        */
-
                         Text(
-
                             text = task.deadline,
 
                             color =
@@ -228,29 +156,24 @@ fun TaskSelectionCard(
                             fontSize = 14.sp,
 
                             fontWeight =
-                                FontWeight.Medium
+                                FontWeight.Medium,
+
+                            maxLines = 1,
+
+                            overflow =
+                                TextOverflow.Ellipsis
                         )
                     }
-
-                    /*
-                    ====================================
-                    CHECK ICON
-                    ====================================
-                    */
 
                     if (isSelected) {
 
                         Box(
-
                             modifier = Modifier
                                 .size(28.dp)
                                 .border(
-
                                     width = 2.dp,
-
                                     color =
                                         Color(0xFFB1C4FF),
-
                                     shape =
                                         CircleShape
                                 ),
@@ -260,12 +183,11 @@ fun TaskSelectionCard(
                         ) {
 
                             Icon(
-
                                 imageVector =
                                     Icons.Outlined.Check,
 
                                 contentDescription =
-                                    "Selected",
+                                    "Selected Task",
 
                                 tint =
                                     Color(0xFFB1C4FF),
@@ -281,14 +203,7 @@ fun TaskSelectionCard(
                     modifier = Modifier.height(16.dp)
                 )
 
-                /*
-                ====================================
-                BOTTOM SECTION
-                ====================================
-                */
-
                 Row(
-
                     modifier = Modifier
                         .fillMaxWidth(),
 
@@ -296,14 +211,8 @@ fun TaskSelectionCard(
                         Alignment.CenterVertically
                 ) {
 
-                    /*
-                    ====================================
-                    STATUS BADGE
-                    ====================================
-                    */
-
                     StatusBadge(
-                        status = task.status
+                        status = normalizedStatus
                     )
                 }
             }

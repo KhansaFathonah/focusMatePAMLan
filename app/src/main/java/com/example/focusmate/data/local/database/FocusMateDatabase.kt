@@ -18,15 +18,7 @@ import com.example.focusmate.data.local.entity.TaskEntity
         MotivationEntity::class,
         SettingsEntity::class
     ],
-
-    /*
-    ====================================
-    DATABASE VERSION
-    ====================================
-    */
-
-    version = 3,
-
+    version = 4,
     exportSchema = false
 )
 

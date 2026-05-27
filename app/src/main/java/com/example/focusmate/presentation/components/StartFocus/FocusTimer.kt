@@ -12,7 +12,9 @@ import com.example.focusmate.presentation.theme.TextSecondary
 @Composable
 fun FocusTimer(
 
-    remainingSeconds: Int
+    remainingSeconds: Int,
+
+    isPaused: Boolean = false
 ) {
 
     /*
@@ -36,6 +38,23 @@ fun FocusTimer(
             minutes,
             seconds
         )
+
+    /*
+    ====================================
+    STATUS TEXT
+    ====================================
+    */
+
+    val statusText =
+
+        if (isPaused) {
+
+            "Focus paused"
+
+        } else {
+
+            "Focus session running"
+        }
 
     /*
     ====================================
@@ -63,8 +82,7 @@ fun FocusTimer(
 
         Text(
 
-            text =
-                "Focus in progress...",
+            text = statusText,
 
             color = TextSecondary,
 

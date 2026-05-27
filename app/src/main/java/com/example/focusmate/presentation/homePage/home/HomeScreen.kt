@@ -31,13 +31,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.focusmate.domain.model.Task
 import com.example.focusmate.presentation.components.BottomNavbar
 import com.example.focusmate.presentation.components.MotivationCard
 import com.example.focusmate.presentation.components.TaskCard
 import com.example.focusmate.presentation.navigation.Screen
 import com.example.focusmate.presentation.theme.BackgroundDark
+import com.example.focusmate.presentation.theme.ButtonPrimary
+import com.example.focusmate.presentation.theme.TextPrimary
+import com.example.focusmate.presentation.theme.TextSecondary
 import com.example.focusmate.utils.TaskUtils
-import com.example.focusmate.utils.TimeUtils
 import java.util.Calendar
 
 @Composable
@@ -45,8 +48,8 @@ fun HomeScreen(
 
     navController: NavController,
 
-    viewModel: HomeViewModel = hiltViewModel()
-
+    viewModel: HomeViewModel =
+        hiltViewModel()
 ) {
 
     /*
@@ -79,17 +82,30 @@ fun HomeScreen(
 
     /*
     =========================================
-    SORT TASKS
-    overdue dulu
-    lalu deadline terdekat
+    ACTIVE TASKS
     =========================================
     */
 
-    val sortedTasks = remember(
+    val activeTasks = remember(
         uiState.tasks
     ) {
 
-        TaskUtils.sortTasksByPriority(
+        TaskUtils.getActiveTasks(
+            uiState.tasks
+        )
+    }
+
+    /*
+    =========================================
+    COMPLETED TASKS
+    =========================================
+    */
+
+    val completedTasks = remember(
+        uiState.tasks
+    ) {
+
+        TaskUtils.getCompletedTasks(
             uiState.tasks
         )
     }
@@ -106,12 +122,6 @@ fun HomeScreen(
             BackgroundDark
 
     ) { paddingValues ->
-
-        /*
-        =====================================
-        ROOT CONTAINER
-        =====================================
-        */
 
         Box(
 
@@ -171,7 +181,7 @@ fun HomeScreen(
 
                                 text = "Good ",
 
-                                color = Color.White,
+                                color = TextPrimary,
 
                                 fontSize = 34.sp,
 
@@ -181,10 +191,11 @@ fun HomeScreen(
 
                             Text(
 
-                                text = "$greeting$usernamePart",
+                                text =
+                                    "$greeting$usernamePart",
 
                                 color =
-                                    Color(0xFFB1C4FF),
+                                    ButtonPrimary,
 
                                 fontSize = 34.sp,
 
@@ -203,7 +214,7 @@ fun HomeScreen(
                                 "Let's make today productive",
 
                             color =
-                                Color.LightGray,
+                                TextSecondary,
 
                             fontSize = 16.sp
                         )
@@ -232,7 +243,10 @@ fun HomeScreen(
                 =====================================
                 */
 
-                if (sortedTasks.isEmpty()) {
+                if (
+                    activeTasks.isEmpty() &&
+                    completedTasks.isEmpty()
+                ) {
 
                     item {
 
@@ -257,7 +271,7 @@ fun HomeScreen(
                                         "No tasks yet ✨",
 
                                     color =
-                                        Color.White,
+                                        TextPrimary,
 
                                     fontSize = 20.sp,
 
@@ -275,7 +289,7 @@ fun HomeScreen(
                                         "Tap the + button to create your first task.",
 
                                     color =
-                                        Color.LightGray,
+                                        TextSecondary,
 
                                     fontSize = 15.sp
                                 )
@@ -286,136 +300,141 @@ fun HomeScreen(
 
                 /*
                 =====================================
-                TASK LIST
+                ONGOING TASKS
                 =====================================
                 */
 
-                items(
+                if (activeTasks.isNotEmpty()) {
 
-                    items = sortedTasks,
+                    item {
 
-                    key = { task ->
+                        Column {
 
-                        task.id
-                    }
+                            Text(
 
-                ) { task ->
+                                text =
+                                    "Ongoing Tasks",
 
-                    /*
-                    =================================
-                    DISPLAY TASK
-                    =================================
-                    */
+                                color =
+                                    TextPrimary,
 
-                    val displayTask = when {
+                                fontSize = 22.sp,
 
-                        /*
-                        completed tetap completed
-                        */
-
-                        task.status == "Completed" -> {
-
-                            task
-                        }
-
-                        /*
-                        overdue
-                        */
-
-                        TimeUtils.isTaskOverdue(
-                            task.deadline
-                        ) -> {
-
-                            task.copy(
-                                status = "Overdue"
+                                fontWeight =
+                                    FontWeight.ExtraBold
                             )
-                        }
 
-                        /*
-                        reset overdue
-                        */
-
-                        task.status == "Overdue" -> {
-
-                            task.copy(
-                                status = "Not Started"
+                            Spacer(
+                                modifier = Modifier.height(4.dp)
                             )
-                        }
 
-                        else -> {
+                            Text(
 
-                            task
+                                text =
+                                    "${activeTasks.size} active tasks",
+
+                                color =
+                                    TextSecondary,
+
+                                fontSize = 14.sp
+                            )
                         }
                     }
 
-                    TaskCard(
+                    items(
 
-                        task = displayTask,
+                        items = activeTasks,
 
-                        /*
-                        =================================
-                        EDIT TASK
-                        =================================
-                        */
+                        key = { task ->
 
-                        onEditClick = { editedTask ->
+                            task.id
+                        }
 
-                            val finalTask = when {
+                    ) { task ->
 
-                                editedTask.status ==
-                                        "Completed" -> {
+                        HomeTaskItem(
 
-                                    editedTask
-                                }
+                            task = task,
 
-                                TimeUtils.isTaskOverdue(
-                                    editedTask.deadline
-                                ) -> {
+                            viewModel = viewModel
+                        )
+                    }
+                }
 
-                                    editedTask.copy(
-                                        status = "Overdue"
-                                    )
-                                }
+                /*
+                =====================================
+                COMPLETED TASKS
+                =====================================
+                */
 
-                                editedTask.status ==
-                                        "Overdue" -> {
+                if (completedTasks.isNotEmpty()) {
 
-                                    editedTask.copy(
-                                        status =
-                                            "Not Started"
-                                    )
-                                }
+                    item {
 
-                                else -> {
+                        Spacer(
+                            modifier = Modifier.height(4.dp)
+                        )
+                    }
 
-                                    editedTask
-                                }
-                            }
+                    item {
 
-                            viewModel.updateTask(
-                                finalTask
+                        Column {
+
+                            Text(
+
+                                text =
+                                    "Completed Tasks",
+
+                                color =
+                                    TextPrimary,
+
+                                fontSize = 22.sp,
+
+                                fontWeight =
+                                    FontWeight.ExtraBold
                             )
-                        },
 
-                        /*
-                        =================================
-                        DELETE TASK
-                        =================================
-                        */
+                            Spacer(
+                                modifier = Modifier.height(4.dp)
+                            )
 
-                        onDeleteClick = {
+                            Text(
 
-                            viewModel.deleteTask(
-                                displayTask
+                                text =
+                                    "${completedTasks.size} completed tasks",
+
+                                color =
+                                    TextSecondary,
+
+                                fontSize = 14.sp
                             )
                         }
-                    )
+                    }
+
+                    items(
+
+                        items = completedTasks,
+
+                        key = { task ->
+
+                            task.id
+                        }
+
+                    ) { task ->
+
+                        HomeTaskItem(
+
+                            task = task,
+
+                            viewModel = viewModel
+                        )
+                    }
                 }
             }
 
             /*
             =====================================
-            FLOATING NAVBAR + FAB
+            FLOATING NAVBAR
             =====================================
             */
 
@@ -424,12 +443,6 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-
-                /*
-                =================================
-                NAVBAR
-                =================================
-                */
 
                 BottomNavbar(
 
@@ -448,9 +461,9 @@ fun HomeScreen(
                 )
 
                 /*
-                =================================
-                FLOATING BUTTON
-                =================================
+                =====================================
+                FLOATING ACTION BUTTON
+                =====================================
                 */
 
                 FloatingActionButton(
@@ -494,6 +507,52 @@ fun HomeScreen(
             }
         }
     }
+}
+
+/*
+=========================================
+HOME TASK ITEM
+=========================================
+*/
+
+@Composable
+private fun HomeTaskItem(
+
+    task: Task,
+
+    viewModel: HomeViewModel
+) {
+
+    TaskCard(
+
+        task = task,
+
+        /*
+        =================================
+        EDIT TASK
+        =================================
+        */
+
+        onEditClick = { editedTask ->
+
+            viewModel.updateTask(
+                editedTask
+            )
+        },
+
+        /*
+        =================================
+        DELETE TASK
+        =================================
+        */
+
+        onDeleteClick = {
+
+            viewModel.deleteTask(
+                task
+            )
+        }
+    )
 }
 
 /*

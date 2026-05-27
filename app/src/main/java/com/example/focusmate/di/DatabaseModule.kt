@@ -18,105 +18,53 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-    /*
-    ========================================
-    DATABASE
-    ========================================
-    */
-
     @Provides
     @Singleton
     fun provideDatabase(
-
         @ApplicationContext
         context: Context
-
     ): FocusMateDatabase {
 
         return Room.databaseBuilder(
-
             context,
-
             FocusMateDatabase::class.java,
-
             "focusmate_db"
-
         )
-
-            /*
-            ====================================
-            RESET OLD SCHEMA
-            ====================================
-            */
-
             .fallbackToDestructiveMigration()
-
             .build()
     }
-
-    /*
-    ========================================
-    TASK DAO
-    ========================================
-    */
 
     @Provides
     @Singleton
     fun provideTaskDao(
-
         database: FocusMateDatabase
-
     ): TaskDao {
 
         return database.taskDao()
     }
 
-    /*
-    ========================================
-    MOTIVATION DAO
-    ========================================
-    */
-
     @Provides
     @Singleton
     fun provideMotivationDao(
-
         database: FocusMateDatabase
-
     ): MotivationDao {
 
         return database.motivationDao()
     }
 
-    /*
-    ========================================
-    FOCUS SESSION DAO
-    ========================================
-    */
-
     @Provides
     @Singleton
     fun provideFocusSessionDao(
-
         database: FocusMateDatabase
-
     ): FocusSessionDao {
 
         return database.focusSessionDao()
     }
 
-    /*
-    ========================================
-    SETTINGS DAO
-    ========================================
-    */
-
     @Provides
     @Singleton
     fun provideSettingsDao(
-
         database: FocusMateDatabase
-
     ): SettingsDao {
 
         return database.settingsDao()

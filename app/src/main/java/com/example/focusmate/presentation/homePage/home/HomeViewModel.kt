@@ -20,184 +20,71 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-
-    private val getAllTasksUseCase:
-    GetAllTasksUseCase,
-
-    private val deleteTaskUseCase:
-    DeleteTaskUseCase,
-
-    private val getRandomQuoteUseCase:
-    GetRandomQuoteUseCase,
-
-    private val refreshQuoteUseCase:
-    RefreshQuoteUseCase,
-
-    private val getSettingsUseCase:
-    GetSettingsUseCase,
-
-    private val updateTaskStatusUseCase:
-    UpdateTaskStatusUseCase
-
+    private val getAllTasksUseCase: GetAllTasksUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val getRandomQuoteUseCase: GetRandomQuoteUseCase,
+    private val refreshQuoteUseCase: RefreshQuoteUseCase,
+    private val getSettingsUseCase: GetSettingsUseCase,
+    private val updateTaskStatusUseCase: UpdateTaskStatusUseCase
 ) : ViewModel() {
 
-    /*
-    ====================================
-    UI STATE
-    ====================================
-    */
-
     private val _uiState =
+        MutableStateFlow(HomeUiState())
 
-        MutableStateFlow(
-            HomeUiState()
-        )
-
-    val uiState:
-            StateFlow<HomeUiState> =
-
+    val uiState: StateFlow<HomeUiState> =
         _uiState.asStateFlow()
 
-    /*
-    ====================================
-    INIT
-    ====================================
-    */
-
     init {
-
         loadHomeData()
-
         refreshQuote()
     }
-
-    /*
-    ====================================
-    LOAD HOME DATA
-    ====================================
-    */
 
     private fun loadHomeData() {
 
         viewModelScope.launch {
 
             combine(
-
                 getAllTasksUseCase(),
-
                 getRandomQuoteUseCase(),
-
                 getSettingsUseCase()
-
             ) { tasks, quote, settings ->
-
-                /*
-                ================================
-                UPDATE OVERDUE TASKS
-                ================================
-                */
 
                 checkOverdueTasks(tasks)
 
-                /*
-                ================================
-                UPDATE UI TASKS
-                ================================
-                */
-
                 val updatedTasks =
-
                     tasks.map { task ->
 
-                        /*
-                        ============================
-                        COMPLETED
-                        ============================
-                        */
+                        when {
 
-                        if (
-                            task.status == "Completed"
-                        ) {
-
-                            task
-
-                        }
-
-                        /*
-                        ============================
-                        IN PROGRESS
-                        tetap in progress
-                        ============================
-                        */
-
-                        else if (
-                            task.status == "In Progress"
-                        ) {
-
-                            task
-                        }
-
-                        /*
-                        ============================
-                        OVERDUE
-                        ============================
-                        */
-
-                        else if (
+                            task.status == "Completed" -> {
+                                task
+                            }
 
                             TimeUtils.isTaskOverdue(
                                 task.deadline
-                            )
-
-                        ) {
-
-                            task.copy(
-                                status = "Overdue"
-                            )
-
-                        }
-
-                        /*
-                        ============================
-                        NORMAL
-                        ============================
-                        */
-
-                        else {
-
-                            /*
-                            reset overdue
-                            jika deadline berubah
-                            */
-
-                            if (
-                                task.status == "Overdue"
-                            ) {
+                            ) -> {
 
                                 task.copy(
-                                    status =
-                                        "Not Started"
+                                    status = "Overdue"
                                 )
+                            }
 
-                            } else {
+                            task.status == "Overdue" -> {
 
+                                task.copy(
+                                    status = "Not Started"
+                                )
+                            }
+
+                            else -> {
                                 task
                             }
                         }
                     }
 
-                /*
-                ================================
-                RETURN UI STATE
-                ================================
-                */
-
                 HomeUiState(
-
                     tasks = updatedTasks,
-
                     motivation = quote,
-
                     username =
                         settings?.username.orEmpty()
                 )
@@ -209,51 +96,28 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    CHECK OVERDUE TASKS
-    ====================================
-    */
-
     private suspend fun checkOverdueTasks(
-
         tasks: List<Task>
-
     ) {
 
         tasks.forEach { task ->
 
-            /*
-            ================================
-            SKIP
-            ================================
-            */
-
             if (
-
                 task.status == "Completed"
-                ||
-                task.status == "In Progress"
-                ||
-                task.status == "Overdue"
-
             ) {
-
                 return@forEach
             }
 
-            /*
-            ================================
-            CHECK OVERDUE
-            ================================
-            */
+            if (
+                task.status == "Overdue"
+            ) {
+                return@forEach
+            }
 
             if (
-
                 TimeUtils.isTaskOverdue(
                     task.deadline
                 )
-
             ) {
 
                 updateTaskStatusUseCase(
@@ -266,12 +130,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    EVENT
-    ====================================
-    */
-
     fun onEvent(
         event: HomeEvent
     ) {
@@ -279,7 +137,6 @@ class HomeViewModel @Inject constructor(
         when (event) {
 
             is HomeEvent.RefreshQuote -> {
-
                 refreshQuote()
             }
 
@@ -299,12 +156,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    REFRESH QUOTE
-    ====================================
-    */
-
     private fun refreshQuote() {
 
         viewModelScope.launch {
@@ -312,12 +163,6 @@ class HomeViewModel @Inject constructor(
             refreshQuoteUseCase()
         }
     }
-
-    /*
-    ====================================
-    COMPLETE TASK
-    ====================================
-    */
 
     private fun completeTask(
         task: Task
@@ -334,12 +179,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    UPDATE TASK
-    ====================================
-    */
-
     fun updateTask(
         task: Task
     ) {
@@ -349,12 +188,6 @@ class HomeViewModel @Inject constructor(
             updateTaskStatusUseCase(task)
         }
     }
-
-    /*
-    ====================================
-    DELETE TASK
-    ====================================
-    */
 
     fun deleteTask(
         task: Task

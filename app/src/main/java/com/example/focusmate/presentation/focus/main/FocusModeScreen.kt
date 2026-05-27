@@ -248,7 +248,7 @@ fun FocusModeScreen(
                 onClick = {
 
                     navController.navigate(
-                        Screen.StartFocus.route
+                        Screen.QuickFocusDuration.route
                     )
                 }
             )

@@ -485,7 +485,6 @@ private fun FocusSession.displayStatus(): String {
 
     return when {
         isCompleted -> "Completed"
-        isRunning -> "In Progress"
         else -> "Not Started"
     }
 }

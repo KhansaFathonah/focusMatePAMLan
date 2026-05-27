@@ -29,6 +29,15 @@ sealed class Screen(
     data object SessionComplete :
         Screen("session_complete")
 
+    data object QuickFocusDuration :
+        Screen("quick_focus_duration")
+
+    data object QuickFocusSession :
+        Screen("quick_focus_session")
+
+    data object QuickFocusComplete :
+        Screen("quick_focus_complete")
+
     data object Progress :
         Screen("progress")
 
