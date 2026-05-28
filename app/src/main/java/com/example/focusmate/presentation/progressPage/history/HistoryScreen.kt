@@ -43,6 +43,9 @@ import androidx.navigation.NavController
 import com.example.focusmate.domain.model.FocusSession
 import com.example.focusmate.presentation.components.StatusBadge
 import com.example.focusmate.presentation.theme.BackgroundDark
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 private val HistoryPanel =
     Color(0x33212E4E)
@@ -65,6 +68,16 @@ private val HistoryMutedSoft =
 private val HistoryTabsBg =
     Color(0xFF7284B2)
 
+private data class HistoryDateKey(
+    val label: String,
+    val sortTime: Long
+)
+
+private data class HistoryDateGroup(
+    val key: HistoryDateKey,
+    val sessions: List<FocusSession>
+)
+
 @Composable
 fun HistoryScreen(
 
@@ -86,6 +99,13 @@ fun HistoryScreen(
     val totalMinutes =
         displaySessions.sumOf { session ->
             session.durationMinutes
+        }
+
+    val sessionGroups =
+        remember(displaySessions) {
+            groupSessionsByDate(
+                displaySessions
+            )
         }
 
     LazyColumn(
@@ -132,29 +152,36 @@ fun HistoryScreen(
             )
         }
 
-        item {
+        sessionGroups.forEach { group ->
 
-            Spacer(
-                modifier = Modifier.height(24.dp)
-            )
+            item(
+                key = "header-${group.key.label}-${group.key.sortTime}"
+            ) {
 
-            TodayHeader()
-        }
+                Spacer(
+                    modifier = Modifier.height(24.dp)
+                )
 
-        items(
-            items = displaySessions,
-            key = { session ->
-                session.id
+                DateHeader(
+                    label = group.key.label
+                )
             }
-        ) { session ->
 
-            Spacer(
-                modifier = Modifier.height(13.dp)
-            )
+            items(
+                items = group.sessions,
+                key = { session ->
+                    session.id
+                }
+            ) { session ->
 
-            HistorySessionCard(
-                session = session
-            )
+                Spacer(
+                    modifier = Modifier.height(13.dp)
+                )
+
+                HistorySessionCard(
+                    session = session
+                )
+            }
         }
     }
 }
@@ -369,7 +396,9 @@ private fun HistoryTabs(
 }
 
 @Composable
-private fun TodayHeader() {
+private fun DateHeader(
+    label: String
+) {
 
     Row(
         modifier = Modifier
@@ -393,7 +422,7 @@ private fun TodayHeader() {
         )
 
         Text(
-            text = "Today",
+            text = label,
             color = Color.White,
             fontSize = 15.sp,
             lineHeight = 24.sp,
@@ -496,4 +525,120 @@ private fun FocusSession.timeRange(): String {
     } else {
         "$startTime - $endTime"
     }
+}
+
+private fun groupSessionsByDate(
+    sessions: List<FocusSession>
+): List<HistoryDateGroup> {
+
+    return sessions
+        .groupBy { session ->
+            historyDateKey(
+                session.date
+            )
+        }
+        .map { (key, groupedSessions) ->
+            HistoryDateGroup(
+                key = key,
+                sessions = groupedSessions
+            )
+        }
+        .sortedByDescending { group ->
+            group.key.sortTime
+        }
+}
+
+private fun historyDateKey(
+    value: String
+): HistoryDateKey {
+
+    val calendar =
+        parseHistoryDate(
+            value
+        )
+
+    if (calendar == null) {
+
+        return HistoryDateKey(
+            label =
+                value.ifBlank {
+                    "Unknown Date"
+                },
+            sortTime = Long.MIN_VALUE
+        )
+    }
+
+    return HistoryDateKey(
+        label =
+            if (calendar.isToday()) {
+                "Today"
+            } else {
+                SimpleDateFormat(
+                    "dd MMMM yyyy",
+                    Locale.ENGLISH
+                ).format(
+                    calendar.time
+                )
+            },
+        sortTime = calendar.timeInMillis
+    )
+}
+
+private fun parseHistoryDate(
+    value: String
+): Calendar? {
+
+    val formats =
+        listOf(
+            "yyyy-MM-dd",
+            "dd MMM yyyy",
+            "dd MMMM yyyy"
+        )
+
+    formats.forEach { pattern ->
+
+        val parsed =
+            runCatching {
+                SimpleDateFormat(
+                    pattern,
+                    Locale.getDefault()
+                ).apply {
+                    isLenient = false
+                }.parse(value)
+            }.getOrNull()
+
+        if (parsed != null) {
+
+            return Calendar.getInstance()
+                .apply {
+                    time = parsed
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+        }
+    }
+
+    if (value.equals("Today", ignoreCase = true)) {
+
+        return Calendar.getInstance()
+            .apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+    }
+
+    return null
+}
+
+private fun Calendar.isToday(): Boolean {
+
+    val today =
+        Calendar.getInstance()
+
+    return get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+            get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
 }

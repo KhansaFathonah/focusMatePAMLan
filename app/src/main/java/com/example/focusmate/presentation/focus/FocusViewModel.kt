@@ -2,7 +2,10 @@ package com.example.focusmate.presentation.focus
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.focusmate.domain.model.FocusSession
 import com.example.focusmate.domain.model.Task
+import com.example.focusmate.domain.usecase.focus.StartFocusSessionUseCase
+import com.example.focusmate.domain.usecase.focus.UpdateFocusSessionUseCase
 import com.example.focusmate.domain.usecase.task.GetAllTasksUseCase
 import com.example.focusmate.domain.usecase.task.UpdateTaskStatusUseCase
 import com.example.focusmate.utils.TaskUtils
@@ -14,6 +17,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +29,13 @@ class FocusViewModel @Inject constructor(
     GetAllTasksUseCase,
 
     private val updateTaskStatusUseCase:
-    UpdateTaskStatusUseCase
+    UpdateTaskStatusUseCase,
+
+    private val startFocusSessionUseCase:
+    StartFocusSessionUseCase,
+
+    private val updateFocusSessionUseCase:
+    UpdateFocusSessionUseCase
 
 ) : ViewModel() {
 
@@ -130,6 +142,17 @@ class FocusViewModel @Inject constructor(
         task: Task
     ) {
 
+        val currentState =
+            _uiState.value
+
+        if (
+            currentState.isCompleted &&
+            currentState.selectedTask?.id == task.id
+        ) {
+
+            return
+        }
+
         viewModelScope.launch {
 
             updateTaskStatusUseCase(
@@ -158,7 +181,7 @@ class FocusViewModel @Inject constructor(
     ) {
 
         val durationInSeconds =
-            minutes * 60
+            5
 
         _uiState.update { currentState ->
 
@@ -184,9 +207,53 @@ class FocusViewModel @Inject constructor(
 
         timerJob?.cancel()
 
-        _uiState.update { currentState ->
+        val currentState =
+            _uiState.value
 
-            currentState.copy(
+        val selectedTask =
+            currentState.selectedTask
+
+        val shouldPersistSession =
+            currentState.isQuickFocus ||
+                    selectedTask != null
+
+        if (shouldPersistSession) {
+
+            viewModelScope.launch {
+
+                val session =
+                    createRunningSession(
+                        state = currentState,
+                        task = selectedTask
+                    )
+
+                val sessionId =
+                    startFocusSessionUseCase(
+                        session
+                    ).toInt()
+
+                _uiState.update { state ->
+
+                    state.copy(
+                        activeSession =
+                            session.copy(
+                                id = sessionId
+                            ),
+                        isRunning = true,
+                        isPaused = false,
+                        isCompleted = false
+                    )
+                }
+
+                startTimer()
+            }
+
+            return
+        }
+
+        _uiState.update { state ->
+
+            state.copy(
 
                 isRunning = true,
 
@@ -197,6 +264,28 @@ class FocusViewModel @Inject constructor(
         }
 
         startTimer()
+    }
+
+    private fun createRunningSession(
+        state: FocusUiState,
+        task: Task?
+    ): FocusSession {
+
+        val durationMinutes =
+            state.selectedDuration
+                ?: (state.totalSeconds / 60)
+
+        return FocusSession(
+            taskId = task?.id,
+            taskTitle = task?.title,
+            durationMinutes = durationMinutes,
+            remainingSeconds = state.remainingSeconds,
+            totalSeconds = state.totalSeconds,
+            isRunning = true,
+            isCompleted = false,
+            date = todayDate(),
+            startTime = currentTime()
+        )
     }
 
     private fun startTimer() {
@@ -365,35 +454,48 @@ class FocusViewModel @Inject constructor(
             currentState.selectedTask
 
         val completedMinutes =
+            currentState.selectedDuration
+                ?: (currentState.totalSeconds / 60)
 
-            currentState.focusedSeconds / 60
+        val shouldPersistSession =
+            currentState.isQuickFocus ||
+                    selectedTask != null
 
-        if (
-            !currentState.isQuickFocus &&
-            selectedTask != null
-        ) {
+        if (shouldPersistSession) {
 
             viewModelScope.launch {
 
-                val updatedTask =
-
-                    selectedTask.copy(
-
-                        status = "Completed",
-
-                        focusMinutes =
-
-                            selectedTask.focusMinutes +
-                                    completedMinutes,
-
-                        focusSessions =
-
-                            selectedTask.focusSessions + 1
-                    )
-
-                updateTaskStatusUseCase(
-                    updatedTask
+                saveCompletedSession(
+                    state = currentState,
+                    task = selectedTask,
+                    completedMinutes = completedMinutes
                 )
+
+                if (
+                    !currentState.isQuickFocus &&
+                    selectedTask != null
+                ) {
+
+                    val updatedTask =
+
+                        selectedTask.copy(
+
+                            status = "Completed",
+
+                            focusMinutes =
+
+                                selectedTask.focusMinutes +
+                                        completedMinutes,
+
+                            focusSessions =
+
+                                selectedTask.focusSessions + 1
+                        )
+
+                    updateTaskStatusUseCase(
+                        updatedTask
+                    )
+                }
             }
         }
 
@@ -407,7 +509,81 @@ class FocusViewModel @Inject constructor(
 
                 isCompleted = true,
 
+                remainingSeconds = 0,
+
                 progress = 0f
+            )
+        }
+    }
+
+    private suspend fun saveCompletedSession(
+        state: FocusUiState,
+        task: Task?,
+        completedMinutes: Int
+    ) {
+
+        val runningSession =
+            state.activeSession
+
+        val completedSession =
+            if (runningSession != null) {
+
+                runningSession.copy(
+                    taskId = task?.id,
+                    taskTitle = task?.title,
+                    durationMinutes = completedMinutes,
+                    remainingSeconds = 0,
+                    totalSeconds = state.totalSeconds,
+                    isRunning = false,
+                    isCompleted = true,
+                    date = todayDate(),
+                    endTime = currentTime()
+                )
+
+            } else {
+
+                FocusSession(
+                    taskId = task?.id,
+                    taskTitle = task?.title,
+                    durationMinutes = completedMinutes,
+                    remainingSeconds = 0,
+                    totalSeconds = state.totalSeconds,
+                    isRunning = false,
+                    isCompleted = true,
+                    date = todayDate(),
+                    startTime = currentTime(),
+                    endTime = currentTime()
+                )
+            }
+
+        val savedSession =
+            if (runningSession != null) {
+
+                completedSession
+
+            } else {
+
+                val sessionId =
+                    startFocusSessionUseCase(
+                        completedSession
+                    ).toInt()
+
+                completedSession.copy(
+                    id = sessionId
+                )
+            }
+
+        if (runningSession != null) {
+
+            updateFocusSessionUseCase(
+                savedSession
+            )
+        }
+
+        _uiState.update { currentState ->
+
+            currentState.copy(
+                activeSession = savedSession
             )
         }
     }
@@ -465,5 +641,25 @@ class FocusViewModel @Inject constructor(
         super.onCleared()
 
         timerJob?.cancel()
+    }
+
+    private fun todayDate(): String {
+
+        return SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.getDefault()
+        ).format(
+            Date()
+        )
+    }
+
+    private fun currentTime(): String {
+
+        return SimpleDateFormat(
+            "HH:mm",
+            Locale.getDefault()
+        ).format(
+            Date()
+        )
     }
 }

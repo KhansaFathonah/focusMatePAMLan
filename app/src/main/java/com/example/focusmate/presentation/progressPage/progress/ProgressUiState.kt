@@ -17,6 +17,13 @@ data class ProgressUiState(
 
     val totalSessions: Int = 0,
 
+    val focusSessions: Int = 0,
+
+    val thisWeekCompleted: Int = 0,
+
+    val weeklyActivity: List<Int> =
+        List(7) { 0 },
+
     val weeklyMinutes: List<Int> =
-        listOf(25, 35, 34, 44, 38, 58, 82)
+        List(7) { 0 }
 )

@@ -13,7 +13,7 @@ interface FocusRepository {
 
     suspend fun startSession(
         session: FocusSession
-    )
+    ): Long
 
     /*
     ====================================
@@ -51,6 +51,12 @@ interface FocusRepository {
     */
 
     fun getAllSessions():
+            Flow<List<FocusSession>>
+
+    fun getCompletedSessions():
+            Flow<List<FocusSession>>
+
+    fun getCompletedTaskSessions():
             Flow<List<FocusSession>>
 
     /*

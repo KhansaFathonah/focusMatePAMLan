@@ -21,7 +21,7 @@ interface FocusSessionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSession(
         session: FocusSessionEntity
-    )
+    ): Long
 
     /*
     ====================================
@@ -74,6 +74,39 @@ interface FocusSessionDao {
         """
     )
     fun getAllSessions():
+            Flow<List<FocusSessionEntity>>
+
+    /*
+    ====================================
+    COMPLETED SESSIONS
+    ====================================
+    */
+
+    @Query(
+        """
+        SELECT * FROM focus_sessions
+        WHERE isCompleted = 1
+        ORDER BY id DESC
+        """
+    )
+    fun getCompletedSessions():
+            Flow<List<FocusSessionEntity>>
+
+    /*
+    ====================================
+    COMPLETED TASK SESSIONS
+    ====================================
+    */
+
+    @Query(
+        """
+        SELECT * FROM focus_sessions
+        WHERE isCompleted = 1
+        AND taskId IS NOT NULL
+        ORDER BY id DESC
+        """
+    )
+    fun getCompletedTaskSessions():
             Flow<List<FocusSessionEntity>>
 
     /*

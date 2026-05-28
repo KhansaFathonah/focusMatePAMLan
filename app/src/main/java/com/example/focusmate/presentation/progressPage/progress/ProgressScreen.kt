@@ -1,6 +1,5 @@
 package com.example.focusmate.presentation.progressPage.progress
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,9 +29,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -41,12 +37,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.focusmate.presentation.components.BottomNavbar
+import com.example.focusmate.presentation.components.WeeklyChart
 import com.example.focusmate.presentation.navigation.Screen
 import com.example.focusmate.presentation.theme.BackgroundDark
 import com.example.focusmate.presentation.theme.ButtonPrimary
 import com.example.focusmate.presentation.theme.CardDark
 import com.example.focusmate.presentation.theme.TextMuted
 import com.example.focusmate.presentation.theme.TextSecondary
+import java.util.Calendar
 
 @Composable
 fun ProgressScreen(
@@ -71,10 +69,10 @@ fun ProgressScreen(
         uiState.totalSessions
 
     val weekTasks =
-        uiState.weeklyMinutes.sum()
+        uiState.thisWeekCompleted
 
     val weeklyValues =
-        uiState.weeklyMinutes
+        uiState.weeklyActivity
 
     Box(
         modifier = Modifier
@@ -135,7 +133,7 @@ fun ProgressScreen(
                     icon = Icons.Outlined.CheckCircle,
                     title = "This Week",
                     value = "$weekTasks",
-                    subtitle = "Tasks completed"
+                    subtitle = "Sessions completed"
                 )
             }
 
@@ -160,8 +158,8 @@ fun ProgressScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(
-                    horizontal = 30.dp,
-                    vertical = 30.dp
+                    horizontal = 20.dp,
+                    vertical = 18.dp
                 )
         )
     }
@@ -381,6 +379,11 @@ private fun WeeklyActivityCard(
     val days =
         listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
 
+    val todayIndex =
+        Calendar.getInstance()
+            .get(Calendar.DAY_OF_WEEK) -
+                Calendar.SUNDAY
+
     Surface(
         color = CardDark,
         shape = RoundedCornerShape(16.dp),
@@ -412,41 +415,13 @@ private fun WeeklyActivityCard(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Canvas(
+            WeeklyChart(
+                values = values,
+                highlightedIndex = todayIndex,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-            ) {
-                val maxValue =
-                    (values.maxOrNull() ?: 1).coerceAtLeast(1).toFloat()
-                val barWidth = size.width / 15f
-                val gap =
-                    (size.width - (barWidth * values.size)) /
-                            (values.size - 1).coerceAtLeast(1)
-
-                values.forEachIndexed { index, value ->
-                    val barHeight =
-                        (value / maxValue) * (size.height - 28f)
-                    val x = index * (barWidth + gap)
-                    drawRoundRect(
-                        color =
-                            if (index == values.lastIndex) {
-                                ButtonPrimary
-                            } else {
-                                Color(0xFF637AC6)
-                            },
-                        topLeft = Offset(
-                            x = x,
-                            y = size.height - barHeight - 22f
-                        ),
-                        size = Size(
-                            width = barWidth,
-                            height = barHeight
-                        ),
-                        cornerRadius = CornerRadius(8f, 8f)
-                    )
-                }
-            }
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

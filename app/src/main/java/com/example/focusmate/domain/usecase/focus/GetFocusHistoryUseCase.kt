@@ -12,4 +12,12 @@ class GetFocusHistoryUseCase @Inject constructor(
     operator fun invoke() =
 
         repository.getAllSessions()
+
+    fun completedSessions() =
+
+        repository.getCompletedSessions()
+
+    fun completedTaskSessions() =
+
+        repository.getCompletedTaskSessions()
 }

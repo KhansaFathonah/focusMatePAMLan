@@ -23,9 +23,9 @@ class FocusRepositoryImpl @Inject constructor(
 
     override suspend fun startSession(
         session: FocusSession
-    ) {
+    ): Long {
 
-        dao.insertSession(
+        return dao.insertSession(
             session.toEntity()
         )
     }
@@ -86,6 +86,44 @@ class FocusRepositoryImpl @Inject constructor(
             Flow<List<FocusSession>> {
 
         return dao.getAllSessions()
+            .map { list ->
+
+                list.map { entity ->
+
+                    entity.toDomain()
+                }
+            }
+    }
+
+    /*
+    ====================================
+    COMPLETED SESSIONS
+    ====================================
+    */
+
+    override fun getCompletedSessions():
+            Flow<List<FocusSession>> {
+
+        return dao.getCompletedSessions()
+            .map { list ->
+
+                list.map { entity ->
+
+                    entity.toDomain()
+                }
+            }
+    }
+
+    /*
+    ====================================
+    COMPLETED TASK SESSIONS
+    ====================================
+    */
+
+    override fun getCompletedTaskSessions():
+            Flow<List<FocusSession>> {
+
+        return dao.getCompletedTaskSessions()
             .map { list ->
 
                 list.map { entity ->

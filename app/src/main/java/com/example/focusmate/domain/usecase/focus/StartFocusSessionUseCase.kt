@@ -12,8 +12,8 @@ class StartFocusSessionUseCase @Inject constructor(
 
     suspend operator fun invoke(
         session: FocusSession
-    ) {
+    ): Long {
 
-        repository.startSession(session)
+        return repository.startSession(session)
     }
 }

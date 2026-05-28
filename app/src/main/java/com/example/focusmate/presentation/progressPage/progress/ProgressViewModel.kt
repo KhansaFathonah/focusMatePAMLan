@@ -44,7 +44,7 @@ class ProgressViewModel @Inject constructor(
 
             combine(
                 getAllTasksUseCase(),
-                getFocusHistoryUseCase()
+                getFocusHistoryUseCase.completedSessions()
             ) { tasks, sessions ->
 
                 val completedSessions =
@@ -52,13 +52,21 @@ class ProgressViewModel @Inject constructor(
                         session.isCompleted
                     }
 
+                val completedTaskSessions =
+                    completedSessions.filter { session ->
+                        session.taskId != null
+                    }
+
+                val weeklyActivity =
+                    buildWeeklySessionCounts(
+                        completedSessions
+                    )
+
                 ProgressUiState(
                     tasks = tasks,
-                    sessions = sessions,
+                    sessions = completedSessions,
                     completedTasks =
-                        tasks.count { task ->
-                            task.status == "Completed"
-                        },
+                        completedTaskSessions.size,
                     totalTasks = tasks.size,
                     totalFocusMinutes =
                         completedSessions.sumOf { session ->
@@ -66,10 +74,14 @@ class ProgressViewModel @Inject constructor(
                         },
                     totalSessions =
                         completedSessions.size,
+                    focusSessions =
+                        completedSessions.size,
+                    thisWeekCompleted =
+                        weeklyActivity.sum(),
+                    weeklyActivity =
+                        weeklyActivity,
                     weeklyMinutes =
-                        buildWeeklySessionCounts(
-                            completedSessions
-                        )
+                        weeklyActivity
                 )
 
             }.collect { progressState ->
