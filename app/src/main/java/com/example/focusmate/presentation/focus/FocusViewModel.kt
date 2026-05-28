@@ -27,12 +27,6 @@ class FocusViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    /*
-    ====================================
-    UI STATE
-    ====================================
-    */
-
     private val _uiState =
         MutableStateFlow(
             FocusUiState()
@@ -41,24 +35,12 @@ class FocusViewModel @Inject constructor(
     val uiState: StateFlow<FocusUiState> =
         _uiState.asStateFlow()
 
-    /*
-    ====================================
-    TIMER JOB
-    ====================================
-    */
-
     private var timerJob: Job? = null
 
     init {
 
         loadTasks()
     }
-
-    /*
-    ====================================
-    LOAD TASKS
-    ====================================
-    */
 
     private fun loadTasks() {
 
@@ -78,12 +60,6 @@ class FocusViewModel @Inject constructor(
                         )
 
                     _uiState.update { currentState ->
-
-                        /*
-                        ====================================
-                        REFRESH SELECTED TASK
-                        ====================================
-                        */
 
                         val updatedSelectedTask =
 
@@ -107,16 +83,8 @@ class FocusViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    CHECK OVERDUE TASKS
-    ====================================
-    */
-
     private suspend fun checkOverdueTasks(
-
         tasks: List<Task>
-
     ) {
 
         tasks.forEach { task ->
@@ -146,16 +114,8 @@ class FocusViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    START TASK FOCUS
-    ====================================
-    */
-
     fun startTaskFocus(
-
         task: Task
-
     ) {
 
         _uiState.update { currentState ->
@@ -166,16 +126,8 @@ class FocusViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    COMPLETE TASK
-    ====================================
-    */
-
     fun completeTask(
-
         task: Task
-
     ) {
 
         viewModelScope.launch {
@@ -189,16 +141,8 @@ class FocusViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    SELECT TASK
-    ====================================
-    */
-
     fun selectTask(
-
         task: Task
-
     ) {
 
         _uiState.update { currentState ->
@@ -209,19 +153,12 @@ class FocusViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    SELECT DURATION
-    ====================================
-    */
-
     fun selectDuration(
-
         minutes: Int
-
     ) {
 
-        val durationInSeconds = minutes * 1
+        val durationInSeconds =
+            minutes * 60
 
         _uiState.update { currentState ->
 
@@ -236,16 +173,12 @@ class FocusViewModel @Inject constructor(
                 totalSeconds =
                     durationInSeconds,
 
+                focusedSeconds = 0,
+
                 progress = 1f
             )
         }
     }
-
-    /*
-    ====================================
-    START SESSION
-    ====================================
-    */
 
     fun startFocusSession() {
 
@@ -266,81 +199,65 @@ class FocusViewModel @Inject constructor(
         startTimer()
     }
 
-    /*
-    ====================================
-    START TIMER
-    ====================================
-    */
-
     private fun startTimer() {
 
         timerJob?.cancel()
 
-        timerJob =
-            viewModelScope.launch {
+        timerJob = viewModelScope.launch {
 
-                while (
+            while (_uiState.value.isRunning) {
 
-                    _uiState.value.remainingSeconds > 0 &&
+                delay(1000)
 
-                    _uiState.value.isRunning
-                ) {
+                val currentSeconds =
 
-                    delay(1000)
+                    _uiState.value.remainingSeconds - 1
 
-                    val currentSeconds =
-
-                        _uiState.value
-                            .remainingSeconds - 1
-
-                    val totalSeconds =
-
-                        _uiState.value
-                            .totalSeconds
-
-                    val updatedProgress =
-
-                        if (totalSeconds > 0) {
-
-                            currentSeconds
-                                .toFloat() /
-
-                                    totalSeconds
-                                        .toFloat()
-
-                        } else {
-
-                            0f
-                        }
+                if (currentSeconds <= 0) {
 
                     _uiState.update { currentState ->
 
                         currentState.copy(
 
-                            remainingSeconds =
-                                currentSeconds,
+                            remainingSeconds = 0,
 
-                            progress =
-                                updatedProgress
+                            progress = 0f,
+
+                            focusedSeconds =
+                                currentState.focusedSeconds + 1
                         )
                     }
-                }
-
-                if (
-                    _uiState.value
-                        .remainingSeconds <= 0
-                ) {
 
                     completeSession()
+
+                    break
+                }
+
+                val totalSeconds =
+                    _uiState.value.totalSeconds
+
+                val updatedProgress =
+
+                    currentSeconds.toFloat() /
+                            totalSeconds.toFloat()
+
+                _uiState.update { currentState ->
+
+                    currentState.copy(
+
+                        remainingSeconds =
+                            currentSeconds,
+
+                        progress =
+                            updatedProgress,
+
+                        focusedSeconds =
+                            currentState.focusedSeconds + 1
+                    )
                 }
             }
+        }
     }
-
-    /*
-    ====================================
-    PAUSE TIMER
-    ====================================
-    */
 
     fun pauseTimer() {
 
@@ -357,12 +274,6 @@ class FocusViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    RESUME TIMER
-    ====================================
-    */
-
     fun resumeTimer() {
 
         _uiState.update { currentState ->
@@ -378,26 +289,20 @@ class FocusViewModel @Inject constructor(
         startTimer()
     }
 
-    /*
-    ====================================
-    ADD EXTRA TIME
-    ====================================
-    */
-
     fun addExtraTime() {
 
         val extraTime = 600
 
         _uiState.update { currentState ->
 
-            val updatedTotal =
-
-                currentState.totalSeconds +
-                        extraTime
-
             val updatedRemaining =
 
                 currentState.remainingSeconds +
+                        extraTime
+
+            val updatedTotal =
+
+                currentState.totalSeconds +
                         extraTime
 
             currentState.copy(
@@ -429,12 +334,6 @@ class FocusViewModel @Inject constructor(
         startTimer()
     }
 
-    /*
-    ====================================
-    EXTEND DIALOG
-    ====================================
-    */
-
     fun showExtendDialog() {
 
         _uiState.update { currentState ->
@@ -455,12 +354,6 @@ class FocusViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    COMPLETE SESSION
-    ====================================
-    */
-
     private fun completeSession() {
 
         timerJob?.cancel()
@@ -471,14 +364,9 @@ class FocusViewModel @Inject constructor(
         val selectedTask =
             currentState.selectedTask
 
-        val selectedDuration =
-            currentState.selectedDuration ?: 0
+        val completedMinutes =
 
-        /*
-        ====================================
-        UPDATE TASK STATS
-        ====================================
-        */
+            currentState.focusedSeconds / 60
 
         if (
             !currentState.isQuickFocus &&
@@ -487,7 +375,7 @@ class FocusViewModel @Inject constructor(
 
             viewModelScope.launch {
 
-                updateTaskStatusUseCase(
+                val updatedTask =
 
                     selectedTask.copy(
 
@@ -496,21 +384,18 @@ class FocusViewModel @Inject constructor(
                         focusMinutes =
 
                             selectedTask.focusMinutes +
-                                    selectedDuration,
+                                    completedMinutes,
 
                         focusSessions =
 
                             selectedTask.focusSessions + 1
                     )
+
+                updateTaskStatusUseCase(
+                    updatedTask
                 )
             }
         }
-
-        /*
-        ====================================
-        UPDATE UI
-        ====================================
-        */
 
         _uiState.update {
 
@@ -527,16 +412,8 @@ class FocusViewModel @Inject constructor(
         }
     }
 
-    /*
-    ====================================
-    QUICK FOCUS
-    ====================================
-    */
-
     fun setQuickFocus(
-
         isQuickFocus: Boolean
-
     ) {
 
         _uiState.update { currentState ->
@@ -547,12 +424,6 @@ class FocusViewModel @Inject constructor(
             )
         }
     }
-
-    /*
-    ====================================
-    RESET SESSION
-    ====================================
-    */
 
     fun resetSession() {
 
@@ -578,6 +449,8 @@ class FocusViewModel @Inject constructor(
 
                 totalSeconds = 0,
 
+                focusedSeconds = 0,
+
                 progress = 1f,
 
                 showExtendDialog = false,
@@ -586,12 +459,6 @@ class FocusViewModel @Inject constructor(
             )
         }
     }
-
-    /*
-    ====================================
-    CLEAR
-    ====================================
-    */
 
     override fun onCleared() {
 

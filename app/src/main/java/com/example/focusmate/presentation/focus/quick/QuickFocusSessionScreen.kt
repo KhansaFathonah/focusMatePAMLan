@@ -1,5 +1,6 @@
 package com.example.focusmate.presentation.focus.quick
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,20 +46,14 @@ fun QuickFocusSessionScreen(
         hiltViewModel()
 ) {
 
-    /*
-    ====================================
-    UI STATE
-    ====================================
-    */
-
     val uiState by
     viewModel.uiState.collectAsState()
 
-    /*
-    ====================================
-    SESSION START
-    ====================================
-    */
+    BackHandler(
+        enabled = true
+    ) {
+
+    }
 
     LaunchedEffect(Unit) {
 
@@ -71,12 +66,6 @@ fun QuickFocusSessionScreen(
         viewModel.startFocusSession()
     }
 
-    /*
-    ====================================
-    SESSION COMPLETE
-    ====================================
-    */
-
     LaunchedEffect(
         uiState.isCompleted
     ) {
@@ -88,16 +77,17 @@ fun QuickFocusSessionScreen(
                 "${Screen.QuickFocusComplete.route}/$duration"
             ) {
 
+                popUpTo(
+                    Screen.Focus.route
+                ) {
+
+                    inclusive = false
+                }
+
                 launchSingleTop = true
             }
         }
     }
-
-    /*
-    ====================================
-    RESET SESSION
-    ====================================
-    */
 
     DisposableEffect(Unit) {
 
@@ -106,12 +96,6 @@ fun QuickFocusSessionScreen(
             viewModel.resetSession()
         }
     }
-
-    /*
-    ====================================
-    SCREEN
-    ====================================
-    */
 
     Scaffold(
 
@@ -132,12 +116,6 @@ fun QuickFocusSessionScreen(
                 )
         ) {
 
-            /*
-            ====================================
-            MAIN CONTENT
-            ====================================
-            */
-
             Column(
 
                 modifier = Modifier
@@ -153,21 +131,9 @@ fun QuickFocusSessionScreen(
                     Arrangement.Top
             ) {
 
-                /*
-                ====================================
-                TOP SPACE
-                ====================================
-                */
-
                 Spacer(
                     modifier = Modifier.height(34.dp)
                 )
-
-                /*
-                ====================================
-                TITLE
-                ====================================
-                */
 
                 Text(
 
@@ -181,12 +147,6 @@ fun QuickFocusSessionScreen(
                         FontWeight.ExtraBold
                 )
 
-                /*
-                ====================================
-                SUBTITLE
-                ====================================
-                */
-
                 Spacer(
                     modifier = Modifier.height(4.dp)
                 )
@@ -194,7 +154,7 @@ fun QuickFocusSessionScreen(
                 Text(
 
                     text =
-                        "Stay Focused 🚀",
+                        "Stay Focused",
 
                     color =
                         TextSecondary,
@@ -205,21 +165,9 @@ fun QuickFocusSessionScreen(
                         FontWeight.Medium
                 )
 
-                /*
-                ====================================
-                SPACE
-                ====================================
-                */
-
                 Spacer(
                     modifier = Modifier.height(88.dp)
                 )
-
-                /*
-                ====================================
-                TIMER SECTION
-                ====================================
-                */
 
                 Box(
 
@@ -227,23 +175,11 @@ fun QuickFocusSessionScreen(
                         Alignment.Center
                 ) {
 
-                    /*
-                    ====================================
-                    TIMER RING
-                    ====================================
-                    */
-
                     AnimatedTimerRing(
 
                         progress =
                             uiState.progress
                     )
-
-                    /*
-                    ====================================
-                    TIMER TEXT
-                    ====================================
-                    */
 
                     FocusTimer(
 
@@ -255,21 +191,9 @@ fun QuickFocusSessionScreen(
                     )
                 }
 
-                /*
-                ====================================
-                SPACE
-                ====================================
-                */
-
                 Spacer(
                     modifier = Modifier.height(88.dp)
                 )
-
-                /*
-                ====================================
-                CONTROLS
-                ====================================
-                */
 
                 FocusControls(
 
@@ -294,21 +218,9 @@ fun QuickFocusSessionScreen(
                     }
                 )
 
-                /*
-                ====================================
-                SPACE
-                ====================================
-                */
-
                 Spacer(
                     modifier = Modifier.height(28.dp)
                 )
-
-                /*
-                ====================================
-                SESSION STATUS
-                ====================================
-                */
 
                 Text(
 

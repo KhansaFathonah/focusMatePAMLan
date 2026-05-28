@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.focusmate.presentation.components.BottomNavbar
+import com.example.focusmate.presentation.components.settings.DevelopmentFeatureDialog
 import com.example.focusmate.presentation.navigation.Screen
 import com.example.focusmate.presentation.settingsPage.main.component.SettingsMainMenuCard
 import com.example.focusmate.presentation.theme.BackgroundDark
@@ -52,6 +53,11 @@ fun MainSettingsScreen(
     viewModel.settings.collectAsState()
 
     var showUsernameDialog by
+    remember {
+        mutableStateOf(false)
+    }
+
+    var showNotificationDialog by
     remember {
         mutableStateOf(false)
     }
@@ -76,12 +82,17 @@ fun MainSettingsScreen(
             },
 
             text = {
+
                 OutlinedTextField(
+
                     value = usernameInput,
+
                     onValueChange = {
                         usernameInput = it
                     },
+
                     singleLine = true,
+
                     label = {
                         Text(
                             text = "Name"
@@ -91,8 +102,11 @@ fun MainSettingsScreen(
             },
 
             confirmButton = {
+
                 TextButton(
+
                     onClick = {
+
                         viewModel.updateUsername(
                             usernameInput
                         )
@@ -100,6 +114,7 @@ fun MainSettingsScreen(
                         showUsernameDialog = false
                     }
                 ) {
+
                     Text(
                         text = "Save"
                     )
@@ -107,12 +122,18 @@ fun MainSettingsScreen(
             },
 
             dismissButton = {
+
                 TextButton(
+
                     onClick = {
-                        usernameInput = settings.username
+
+                        usernameInput =
+                            settings.username
+
                         showUsernameDialog = false
                     }
                 ) {
+
                     Text(
                         text = "Cancel"
                     )
@@ -121,11 +142,21 @@ fun MainSettingsScreen(
         )
     }
 
-    /*
-    ====================================
-    SCREEN
-    ====================================
-    */
+    if (showNotificationDialog) {
+
+        DevelopmentFeatureDialog(
+
+            title = "Feature in Development",
+
+            message =
+
+                "Notification and reminder features are currently under development and will be available in a future update.",
+
+            onDismiss = {
+                showNotificationDialog = false
+            }
+        )
+    }
 
     Scaffold(
 
@@ -133,12 +164,6 @@ fun MainSettingsScreen(
             BackgroundDark
 
     ) { paddingValues ->
-
-        /*
-        ====================================
-        ROOT CONTAINER
-        ====================================
-        */
 
         Box(
 
@@ -148,12 +173,6 @@ fun MainSettingsScreen(
                     BackgroundDark
                 )
         ) {
-
-            /*
-            ====================================
-            MAIN CONTENT
-            ====================================
-            */
 
             Column(
 
@@ -173,12 +192,6 @@ fun MainSettingsScreen(
                     Alignment.CenterHorizontally
             ) {
 
-                /*
-                ====================================
-                TITLE
-                ====================================
-                */
-
                 Text(
 
                     text = "Settings",
@@ -195,12 +208,6 @@ fun MainSettingsScreen(
                     modifier = Modifier.height(6.dp)
                 )
 
-                /*
-                ====================================
-                SUBTITLE
-                ====================================
-                */
-
                 Text(
 
                     text =
@@ -216,30 +223,22 @@ fun MainSettingsScreen(
                     modifier = Modifier.height(38.dp)
                 )
 
-                /*
-                ====================================
-                MENU SECTION
-                ====================================
-                */
-
                 Column(
 
                     verticalArrangement =
                         Arrangement.spacedBy(18.dp)
                 ) {
 
-                    /*
-                    ================================
-                    USERNAME
-                    ================================
-                    */
-
                     SettingsMainMenuCard(
 
                         title =
+
                             if (settings.username.isBlank()) {
+
                                 "Username"
+
                             } else {
+
                                 "Username: ${settings.username}"
                             },
 
@@ -256,12 +255,6 @@ fun MainSettingsScreen(
                         }
                     )
 
-                    /*
-                    ================================
-                    NOTIFICATION
-                    ================================
-                    */
-
                     SettingsMainMenuCard(
 
                         title = "Notifications",
@@ -271,17 +264,10 @@ fun MainSettingsScreen(
 
                         onClick = {
 
-                            navController.navigate(
-                                Screen.Notification.route
-                            )
+                            showNotificationDialog =
+                                true
                         }
                     )
-
-                    /*
-                    ================================
-                    BACKUP
-                    ================================
-                    */
 
                     SettingsMainMenuCard(
 
@@ -297,12 +283,6 @@ fun MainSettingsScreen(
                             )
                         }
                     )
-
-                    /*
-                    ================================
-                    ABOUT
-                    ================================
-                    */
 
                     SettingsMainMenuCard(
 
@@ -320,12 +300,6 @@ fun MainSettingsScreen(
                     )
                 }
             }
-
-            /*
-            ====================================
-            BOTTOM NAVBAR
-            ====================================
-            */
 
             BottomNavbar(
 

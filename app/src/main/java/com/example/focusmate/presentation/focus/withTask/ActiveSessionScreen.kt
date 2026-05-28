@@ -1,5 +1,6 @@
 package com.example.focusmate.presentation.focus.withTask
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,20 +40,14 @@ fun ActiveSessionScreen(
     viewModel: FocusViewModel
 ) {
 
-    /*
-    ====================================
-    UI STATE
-    ====================================
-    */
-
     val uiState by
     viewModel.uiState.collectAsState()
 
-    /*
-    ====================================
-    SESSION COMPLETE NAVIGATION
-    ====================================
-    */
+    BackHandler(
+        enabled = true
+    ) {
+
+    }
 
     LaunchedEffect(
         uiState.isCompleted
@@ -69,12 +64,6 @@ fun ActiveSessionScreen(
         }
     }
 
-    /*
-    ====================================
-    SCREEN
-    ====================================
-    */
-
     Box(
 
         modifier = Modifier
@@ -83,12 +72,6 @@ fun ActiveSessionScreen(
                 BackgroundDark
             )
     ) {
-
-        /*
-        ====================================
-        MAIN CONTENT
-        ====================================
-        */
 
         Column(
 
@@ -103,21 +86,9 @@ fun ActiveSessionScreen(
                 Arrangement.Top
         ) {
 
-            /*
-            ====================================
-            TOP SPACE
-            ====================================
-            */
-
             Spacer(
                 modifier = Modifier.height(34.dp)
             )
-
-            /*
-            ====================================
-            TITLE
-            ====================================
-            */
 
             Text(
 
@@ -131,19 +102,13 @@ fun ActiveSessionScreen(
                     FontWeight.ExtraBold
             )
 
-            /*
-            ====================================
-            SUBTITLE
-            ====================================
-            */
-
             Spacer(
                 modifier = Modifier.height(4.dp)
             )
 
             Text(
 
-                text = "Stay Focused 🚀",
+                text = "Stay Focused",
 
                 color = TextSecondary,
 
@@ -153,21 +118,9 @@ fun ActiveSessionScreen(
                     FontWeight.Medium
             )
 
-            /*
-            ====================================
-            SPACE
-            ====================================
-            */
-
             Spacer(
                 modifier = Modifier.height(34.dp)
             )
-
-            /*
-            ====================================
-            TASK CARD
-            ====================================
-            */
 
             TaskCard(
 
@@ -175,21 +128,9 @@ fun ActiveSessionScreen(
                     uiState.selectedTask
             )
 
-            /*
-            ====================================
-            SPACE
-            ====================================
-            */
-
             Spacer(
                 modifier = Modifier.height(54.dp)
             )
-
-            /*
-            ====================================
-            TIMER SECTION
-            ====================================
-            */
 
             Box(
 
@@ -197,23 +138,11 @@ fun ActiveSessionScreen(
                     Alignment.Center
             ) {
 
-                /*
-                ====================================
-                TIMER RING
-                ====================================
-                */
-
                 AnimatedTimerRing(
 
                     progress =
                         uiState.progress
                 )
-
-                /*
-                ====================================
-                TIMER TEXT
-                ====================================
-                */
 
                 FocusTimer(
 
@@ -222,21 +151,9 @@ fun ActiveSessionScreen(
                 )
             }
 
-            /*
-            ====================================
-            SPACE
-            ====================================
-            */
-
             Spacer(
                 modifier = Modifier.height(64.dp)
             )
-
-            /*
-            ====================================
-            FOCUS CONTROLS
-            ====================================
-            */
 
             FocusControls(
 
@@ -244,12 +161,6 @@ fun ActiveSessionScreen(
                     uiState.isRunning,
 
                 onStopClick = {
-
-                    /*
-                    ================================
-                    PAUSE / RESUME
-                    ================================
-                    */
 
                     if (uiState.isRunning) {
 
@@ -267,21 +178,9 @@ fun ActiveSessionScreen(
                 }
             )
 
-            /*
-            ====================================
-            SPACE
-            ====================================
-            */
-
             Spacer(
                 modifier = Modifier.height(22.dp)
             )
-
-            /*
-            ====================================
-            SESSION STATUS
-            ====================================
-            */
 
             Text(
 
@@ -312,21 +211,9 @@ fun ActiveSessionScreen(
             )
         }
 
-        /*
-        ====================================
-        EXTEND FOCUS DIALOG
-        ====================================
-        */
-
         if (uiState.showExtendDialog) {
 
             ExtendFocusDialog(
-
-                /*
-                ================================
-                ADD EXTRA TIME
-                ================================
-                */
 
                 onAddTime = {
 
@@ -334,12 +221,6 @@ fun ActiveSessionScreen(
 
                     viewModel.hideExtendDialog()
                 },
-
-                /*
-                ================================
-                FINISH TASK
-                ================================
-                */
 
                 onFinishTask = {
 

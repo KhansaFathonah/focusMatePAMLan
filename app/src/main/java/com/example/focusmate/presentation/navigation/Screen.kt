@@ -47,9 +47,6 @@ sealed class Screen(
     data object Settings :
         Screen("settings")
 
-    data object Notification :
-        Screen("notification")
-
     data object Backup :
         Screen("backup")
 

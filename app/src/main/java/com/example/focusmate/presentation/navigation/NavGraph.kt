@@ -9,9 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.focusmate.presentation.splash.SplashScreen
-import com.example.focusmate.presentation.homePage.addtask.AddTaskScreen
-import com.example.focusmate.presentation.homePage.home.HomeScreen
 import com.example.focusmate.presentation.focus.FocusViewModel
 import com.example.focusmate.presentation.focus.complete.SessionCompleteScreen
 import com.example.focusmate.presentation.focus.main.FocusModeScreen
@@ -21,12 +18,14 @@ import com.example.focusmate.presentation.focus.quick.QuickFocusSessionScreen
 import com.example.focusmate.presentation.focus.withTask.ActiveSessionScreen
 import com.example.focusmate.presentation.focus.withTask.SelectDurationScreen
 import com.example.focusmate.presentation.focus.withTask.SelectTaskScreen
+import com.example.focusmate.presentation.homePage.addtask.AddTaskScreen
+import com.example.focusmate.presentation.homePage.home.HomeScreen
 import com.example.focusmate.presentation.progressPage.history.HistoryScreen
 import com.example.focusmate.presentation.progressPage.progress.ProgressScreen
 import com.example.focusmate.presentation.settingsPage.about.AboutScreen
 import com.example.focusmate.presentation.settingsPage.backup.BackupScreen
 import com.example.focusmate.presentation.settingsPage.main.MainSettingsScreen
-import com.example.focusmate.presentation.settingsPage.notification.NotificationScreen
+import com.example.focusmate.presentation.splash.SplashScreen
 
 @Composable
 fun NavGraph(
@@ -160,7 +159,6 @@ fun NavGraph(
             )
         }
 
-
         composable(
             route = Screen.SelectTask.route
         ) { backStackEntry ->
@@ -280,15 +278,6 @@ fun NavGraph(
         ) {
 
             MainSettingsScreen(
-                navController = navController
-            )
-        }
-
-        composable(
-            route = Screen.Notification.route
-        ) {
-
-            NotificationScreen(
                 navController = navController
             )
         }
