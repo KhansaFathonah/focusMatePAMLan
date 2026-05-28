@@ -6,5 +6,5 @@ data class HistoryUiState(
 
     val sessions: List<FocusSession> = emptyList(),
 
-    val selectedTab: String = "Daily"
+    val selectedTab: String = "Today"
 )

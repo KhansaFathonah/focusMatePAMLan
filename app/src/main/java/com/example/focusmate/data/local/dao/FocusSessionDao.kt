@@ -23,6 +23,11 @@ interface FocusSessionDao {
         session: FocusSessionEntity
     ): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSessions(
+        sessions: List<FocusSessionEntity>
+    )
+
     /*
     ====================================
     UPDATE SESSION
@@ -75,6 +80,20 @@ interface FocusSessionDao {
     )
     fun getAllSessions():
             Flow<List<FocusSessionEntity>>
+
+    @Query(
+        """
+        SELECT * FROM focus_sessions
+        ORDER BY id DESC
+        """
+    )
+    suspend fun getAllSessionsSnapshot():
+            List<FocusSessionEntity>
+
+    @Query(
+        "DELETE FROM focus_sessions"
+    )
+    suspend fun clearSessions()
 
     /*
     ====================================

@@ -88,11 +88,24 @@ fun HistoryScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    val displaySessions =
+    val completedSessions =
         remember(uiState.sessions) {
             uiState.sessions
                 .filter { session ->
                     session.isCompleted
+                }
+        }
+
+    val displaySessions =
+        remember(
+            completedSessions,
+            uiState.selectedTab
+        ) {
+            completedSessions
+                .filter { session ->
+                    session.isInSelectedHistoryTab(
+                        uiState.selectedTab
+                    )
                 }
         }
 
@@ -180,6 +193,20 @@ fun HistoryScreen(
 
                 HistorySessionCard(
                     session = session
+                )
+            }
+        }
+
+        if (sessionGroups.isEmpty()) {
+
+            item {
+
+                Spacer(
+                    modifier = Modifier.height(24.dp)
+                )
+
+                EmptyHistoryMessage(
+                    selectedTab = uiState.selectedTab
                 )
             }
         }
@@ -327,7 +354,7 @@ private fun HistoryTabs(
 ) {
 
     val tabs =
-        listOf("Daily", "Weekly", "Monthly")
+        listOf("Today", "Weekly", "Monthly")
 
     Row(
         modifier = Modifier
@@ -393,6 +420,20 @@ private fun HistoryTabs(
             }
         }
     }
+}
+
+@Composable
+private fun EmptyHistoryMessage(
+    selectedTab: String
+) {
+
+    Text(
+        text = "No completed sessions for $selectedTab",
+        color = HistoryMuted,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable
@@ -527,6 +568,23 @@ private fun FocusSession.timeRange(): String {
     }
 }
 
+private fun FocusSession.isInSelectedHistoryTab(
+    selectedTab: String
+): Boolean {
+
+    val calendar =
+        parseHistoryDate(
+            date
+        ) ?: return false
+
+    return when (selectedTab.lowercase(Locale.getDefault())) {
+        "today" -> calendar.isToday()
+        "weekly" -> calendar.isThisWeek()
+        "monthly" -> calendar.isThisMonth()
+        else -> true
+    }
+}
+
 private fun groupSessionsByDate(
     sessions: List<FocusSession>
 ): List<HistoryDateGroup> {
@@ -641,4 +699,37 @@ private fun Calendar.isToday(): Boolean {
 
     return get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
             get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+}
+
+private fun Calendar.isThisWeek(): Boolean {
+
+    val weekStart =
+        Calendar.getInstance()
+            .apply {
+                firstDayOfWeek =
+                    Calendar.SUNDAY
+                set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+    val weekEnd =
+        (weekStart.clone() as Calendar)
+            .apply {
+                add(Calendar.DAY_OF_YEAR, 7)
+            }
+
+    return !before(weekStart) &&
+            before(weekEnd)
+}
+
+private fun Calendar.isThisMonth(): Boolean {
+
+    val today =
+        Calendar.getInstance()
+
+    return get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+            get(Calendar.MONTH) == today.get(Calendar.MONTH)
 }
