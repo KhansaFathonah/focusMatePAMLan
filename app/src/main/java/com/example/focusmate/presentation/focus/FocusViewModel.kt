@@ -181,7 +181,7 @@ class FocusViewModel @Inject constructor(
     ) {
 
         val durationInSeconds =
-            5
+            minutes * 60
 
         _uiState.update { currentState ->
 
